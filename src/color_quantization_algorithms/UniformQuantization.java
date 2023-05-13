@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 
 public class UniformQuantization {
 
-    public static BufferedImage quantize(BufferedImage image, double numColors) {
+    public static BufferedImage quantize(BufferedImage image, int numColors) {
         // Calculate the color quantization level
         int levels = (int) Math.ceil(Math.log(numColors) / Math.log(2));
 

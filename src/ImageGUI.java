@@ -67,9 +67,8 @@ public class ImageGUI extends JFrame {
         controlPanel.add(kMeansSpinner);
     }
     public void init_UniformSpinner(){
-        int value=2;
-        double stepSize=value*2;
-        uniformSpinnerModel = new SpinnerNumberModel(0, 1, 1024, 1);
+
+        uniformSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
         uniformSpinner = new JSpinner(uniformSpinnerModel);
         controlPanel.add(uniformLabel);
         controlPanel.add(uniformSpinner);
@@ -89,7 +88,7 @@ public class ImageGUI extends JFrame {
     }
     private void uniform()  {
 
-        BufferedImage quantizedImage = UniformQuantization.quantize(image,(double) uniformSpinnerModel.getValue());
+        BufferedImage quantizedImage = UniformQuantization.quantize(image,(int) uniformSpinnerModel.getValue());
         imageLabel.setIcon(new ImageIcon(quantizedImage));
 
     }
