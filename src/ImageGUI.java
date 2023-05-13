@@ -9,9 +9,10 @@ import color_quantization_algorithms.*;
 public class ImageGUI extends JFrame {
     private JLabel imageLabel;
     private JButton uniformButton, KmeansButton, loadImageButton, restoreOriginal;
+    JLabel kMeanLabel = new JLabel("clusters number");
+    JLabel uniformLabel = new JLabel("colors number");
     private BufferedImage image;
-    SpinnerModel kMeansSpinnerModel;
-    SpinnerModel uniformSpinnerModel;
+    SpinnerModel kMeansSpinnerModel, uniformSpinnerModel;
     JSpinner kMeansSpinner;
     JSpinner uniformSpinner;
     JPanel controlPanel;
@@ -31,6 +32,7 @@ public class ImageGUI extends JFrame {
         init_UniformButton();
         init_KmeansButton();
         init_KmeansSpinner();
+        init_UniformSpinner();
         init_loadImageButton();
         init_restoreOriginalImageButton();
 
@@ -61,11 +63,15 @@ public class ImageGUI extends JFrame {
     public void init_KmeansSpinner(){
         kMeansSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
         kMeansSpinner = new JSpinner(kMeansSpinnerModel);
+        controlPanel.add(kMeanLabel);
         controlPanel.add(kMeansSpinner);
     }
     public void init_UniformSpinner(){
-        uniformSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
+        int value=2;
+        double stepSize=value*2;
+        uniformSpinnerModel = new SpinnerNumberModel(0, 1, 1024, 1);
         uniformSpinner = new JSpinner(uniformSpinnerModel);
+        controlPanel.add(uniformLabel);
         controlPanel.add(uniformSpinner);
     }
     public void loadImage() {
@@ -83,7 +89,7 @@ public class ImageGUI extends JFrame {
     }
     private void uniform()  {
 
-        BufferedImage quantizedImage = UniformQuantization.quantize(image,(int) uniformSpinnerModel.getValue());
+        BufferedImage quantizedImage = UniformQuantization.quantize(image,(double) uniformSpinnerModel.getValue());
         imageLabel.setIcon(new ImageIcon(quantizedImage));
 
     }
