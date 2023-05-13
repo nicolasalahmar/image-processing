@@ -8,7 +8,7 @@ import color_quantization_algorithms.*;
 
 public class ImageGUI extends JFrame {
     private JLabel imageLabel;
-    private JButton grayscaleButton, KmeansButton, loadImageButton;
+    private JButton grayscaleButton, KmeansButton, loadImageButton, restoreOriginal;
     private BufferedImage image;
     SpinnerModel spinnerModel;
     JSpinner spinner;
@@ -30,6 +30,7 @@ public class ImageGUI extends JFrame {
         init_KmeansButton();
         init_KmeansSpinner();
         init_loadImageButton();
+        init_restoreOriginalImageButton();
 
         // Add the components to the frame
         add(imageLabel, BorderLayout.CENTER);
@@ -50,6 +51,11 @@ public class ImageGUI extends JFrame {
         KmeansButton.addActionListener(e -> kMean());
         controlPanel.add(KmeansButton);
     }
+    public void init_restoreOriginalImageButton() {
+        restoreOriginal = new JButton("restore original");
+        restoreOriginal.addActionListener(e -> imageLabel.setIcon(new ImageIcon(image)));
+        controlPanel.add(restoreOriginal);
+    }
     public void init_KmeansSpinner(){
         spinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
         spinner = new JSpinner(spinnerModel);
@@ -57,7 +63,7 @@ public class ImageGUI extends JFrame {
     }
     public void loadImage() {
         // Load the image
-        JFileChooser fileChooser = new JFileChooser();
+        JFileChooser fileChooser = new JFileChooser("C:\\Users\\Nicol\\OneDrive\\Desktop\\College\\Multimedia\\Practical\\Image Processing\\image-processing\\images");
         int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             try {
