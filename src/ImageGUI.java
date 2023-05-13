@@ -3,13 +3,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+
 import color_quantization_algorithms.*;
 
 public class ImageGUI extends JFrame {
     private JLabel imageLabel;
-    private JButton grayscaleButton;
-    private JButton negativeButton;
+    private JButton grayscaleButton, KmeansButton, loadImageButton;
     private BufferedImage image;
+    SpinnerModel spinnerModel;
+    JSpinner spinner;
+    JPanel controlPanel;
 
     public ImageGUI() {
         // Set up the frame
@@ -19,23 +22,39 @@ public class ImageGUI extends JFrame {
 
         // Create the components
         imageLabel = new JLabel();
-        grayscaleButton = new JButton("Grayscale");
-        negativeButton = new JButton("K_Mean");
-
-        // Add event listeners to the buttons
-        grayscaleButton.addActionListener(e -> setGrayscale());
-        negativeButton.addActionListener(e -> kMean());
 
         // Create the control panel
-        JPanel controlPanel = new JPanel();
-        controlPanel.add(grayscaleButton);
-        controlPanel.add(negativeButton);
+        controlPanel = new JPanel();
+        // initialize buttons
+        init_grayScaleButton();
+        init_KmeansButton();
+        init_KmeansSpinner();
+        init_loadImageButton();
 
         // Add the components to the frame
         add(imageLabel, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
     }
-
+    public void init_grayScaleButton() {
+        grayscaleButton = new JButton("Grayscale");
+        grayscaleButton.addActionListener(e -> setGrayscale());
+        controlPanel.add(grayscaleButton);
+    }
+    public void init_loadImageButton() {
+        loadImageButton = new JButton("load image");
+        loadImageButton.addActionListener(e -> loadImage());
+        controlPanel.add(loadImageButton);
+    }
+    public void init_KmeansButton() {
+        KmeansButton = new JButton("K_Means");
+        KmeansButton.addActionListener(e -> kMean());
+        controlPanel.add(KmeansButton);
+    }
+    public void init_KmeansSpinner(){
+        spinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
+        spinner = new JSpinner(spinnerModel);
+        controlPanel.add(spinner);
+    }
     public void loadImage() {
         // Load the image
         JFileChooser fileChooser = new JFileChooser();
@@ -49,7 +68,6 @@ public class ImageGUI extends JFrame {
             }
         }
     }
-
     private void setGrayscale() {
         // Convert the image to grayscale
         BufferedImage grayscaleImage = new BufferedImage(
@@ -59,9 +77,8 @@ public class ImageGUI extends JFrame {
         g.dispose();
         imageLabel.setIcon(new ImageIcon(grayscaleImage));
     }
-
     private void kMean() {
-        BufferedImage bufferedImage = KMeansQuantizer.quantize(image,24);
+        BufferedImage bufferedImage = KMeansQuantizer.quantize(image, (int) spinnerModel.getValue());
         imageLabel.setIcon(new ImageIcon(bufferedImage));
-
-    }}
+    }
+}
