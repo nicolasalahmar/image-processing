@@ -1,10 +1,9 @@
-import color_quantization_algorithms.KMeansClustering;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import color_quantization_algorithms.*;
 
 public class ImageGUI extends JFrame {
     private JLabel imageLabel;
@@ -62,11 +61,7 @@ public class ImageGUI extends JFrame {
     }
 
     private void kMean() {
-        //increasing the k value will make the algorithm trying to find more clusters in data which
-        // means that each cluster smaller portion of the data and will be more specific to the data
-        // points that belong to it
-        //note: don't try to put the k value over 30
-        BufferedImage bufferedImage = KMeansClustering.applyKMeans(image,2);
+        BufferedImage bufferedImage = KMeansQuantizer.quantize(image,24);
         imageLabel.setIcon(new ImageIcon(bufferedImage));
 
     }}
