@@ -37,7 +37,7 @@ public class ImageGUI extends JFrame {
         add(controlPanel, BorderLayout.SOUTH);
     }
     public void init_grayScaleButton() {
-        grayscaleButton = new JButton("Grayscale");
+        grayscaleButton = new JButton("Uniform");
         grayscaleButton.addActionListener(e -> setGrayscale());
         controlPanel.add(grayscaleButton);
     }
@@ -74,14 +74,11 @@ public class ImageGUI extends JFrame {
             }
         }
     }
-    private void setGrayscale() {
-        // Convert the image to grayscale
-        BufferedImage grayscaleImage = new BufferedImage(
-                image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-        Graphics g = grayscaleImage.getGraphics();
-        g.drawImage(image, 0, 0, null);
-        g.dispose();
-        imageLabel.setIcon(new ImageIcon(grayscaleImage));
+    private void setGrayscale()  {
+
+        BufferedImage quantizedImage = UniformQuantization.quantize(image, 24);
+        imageLabel.setIcon(new ImageIcon(quantizedImage));
+
     }
     private void kMean() {
         BufferedImage bufferedImage = KMeansQuantizer.quantize(image, (int) spinnerModel.getValue());
