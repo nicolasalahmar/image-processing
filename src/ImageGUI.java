@@ -8,10 +8,12 @@ import color_quantization_algorithms.*;
 
 public class ImageGUI extends JFrame {
     private JLabel imageLabel;
-    private JButton grayscaleButton, KmeansButton, loadImageButton, restoreOriginal;
+    private JButton uniformButton, KmeansButton, loadImageButton, restoreOriginal;
     private BufferedImage image;
-    SpinnerModel spinnerModel;
-    JSpinner spinner;
+    SpinnerModel kMeansSpinnerModel;
+    SpinnerModel uniformSpinnerModel;
+    JSpinner kMeansSpinner;
+    JSpinner uniformSpinner;
     JPanel controlPanel;
 
     public ImageGUI() {
@@ -26,7 +28,7 @@ public class ImageGUI extends JFrame {
         // Create the control panel
         controlPanel = new JPanel();
         // initialize buttons
-        init_grayScaleButton();
+        init_UniformButton();
         init_KmeansButton();
         init_KmeansSpinner();
         init_loadImageButton();
@@ -36,10 +38,10 @@ public class ImageGUI extends JFrame {
         add(imageLabel, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
     }
-    public void init_grayScaleButton() {
-        grayscaleButton = new JButton("Uniform");
-        grayscaleButton.addActionListener(e -> setGrayscale());
-        controlPanel.add(grayscaleButton);
+    public void init_UniformButton() {
+        uniformButton = new JButton("Uniform");
+        uniformButton.addActionListener(e -> uniform());
+        controlPanel.add(uniformButton);
     }
     public void init_loadImageButton() {
         loadImageButton = new JButton("load image");
@@ -57,9 +59,14 @@ public class ImageGUI extends JFrame {
         controlPanel.add(restoreOriginal);
     }
     public void init_KmeansSpinner(){
-        spinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
-        spinner = new JSpinner(spinnerModel);
-        controlPanel.add(spinner);
+        kMeansSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
+        kMeansSpinner = new JSpinner(kMeansSpinnerModel);
+        controlPanel.add(kMeansSpinner);
+    }
+    public void init_UniformSpinner(){
+        uniformSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
+        uniformSpinner = new JSpinner(uniformSpinnerModel);
+        controlPanel.add(uniformSpinner);
     }
     public void loadImage() {
         // Load the image
@@ -74,14 +81,14 @@ public class ImageGUI extends JFrame {
             }
         }
     }
-    private void setGrayscale()  {
+    private void uniform()  {
 
-        BufferedImage quantizedImage = UniformQuantization.quantize(image, 24);
+        BufferedImage quantizedImage = UniformQuantization.quantize(image,(int) uniformSpinnerModel.getValue());
         imageLabel.setIcon(new ImageIcon(quantizedImage));
 
     }
     private void kMean() {
-        BufferedImage bufferedImage = KMeansQuantizer.quantize(image, (int) spinnerModel.getValue());
+        BufferedImage bufferedImage = KMeansQuantizer.quantize(image, (int) kMeansSpinnerModel.getValue());
         imageLabel.setIcon(new ImageIcon(bufferedImage));
     }
 }
