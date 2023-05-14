@@ -6,6 +6,7 @@ public class Main {
         SwingUtilities.invokeLater(() -> {
             ImageGUI gui = new ImageGUI();
             gui.setVisible(true);
+            gui.setExtendedState(JFrame.MAXIMIZED_BOTH);
             gui.loadImage();
 
         });

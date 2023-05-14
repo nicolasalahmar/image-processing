@@ -2,6 +2,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -9,7 +10,8 @@ import color_quantization_algorithms.*;
 
 public class ImageGUI extends JFrame {
     private JLabel imageLabel;
-    private JButton uniformButton, KmeansButton, loadImageButton, restoreOriginal,saveImageButton;
+    private JButton uniformButton, KmeansButton, loadImageButton, restoreOriginal,saveImageButton,compareButton;
+    int originalImageSize,kMeanImageSize,uniformImageSize;
     JFileChooser fileChooser = new JFileChooser();
 
     BufferedImage currentImage;
@@ -29,6 +31,8 @@ public class ImageGUI extends JFrame {
 
         // Create the components
         imageLabel = new JLabel();
+        imageLabel.setHorizontalAlignment(JLabel.CENTER);
+        imageLabel.setVerticalAlignment(JLabel.CENTER);
 
         // Create the control panel
         controlPanel = new JPanel();
@@ -39,6 +43,7 @@ public class ImageGUI extends JFrame {
         init_UniformSpinner();
         init_loadImageButton();
         init_saveImageButton();
+        init_CompareButton();
         init_restoreOriginalImageButton();
 
         // Add the components to the frame
@@ -49,6 +54,11 @@ public class ImageGUI extends JFrame {
         uniformButton = new JButton("Uniform");
         uniformButton.addActionListener(e -> uniform());
         controlPanel.add(uniformButton);
+    }
+    public void init_CompareButton() {
+        compareButton = new JButton("compare algorithms");
+        compareButton.addActionListener(e -> compareAlgorithms());
+        controlPanel.add(compareButton);
     }
     public void init_loadImageButton() {
         loadImageButton = new JButton("load image");
@@ -85,13 +95,14 @@ public class ImageGUI extends JFrame {
         controlPanel.add(uniformSpinner);
     }
     public void loadImage() {
-        // Load the image
-        JFileChooser fileChooser = new JFileChooser("C:\\Users\\Nicol\\OneDrive\\Desktop\\College\\Multimedia\\Practical\\Image Processing\\image-processing\\images");
+
+        JFileChooser fileChooser = new JFileChooser("C:\\Users\\Jony\\Pictures\\image_processing");
         int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             try {
                 image = ImageIO.read(fileChooser.getSelectedFile());
                 imageLabel.setIcon(new ImageIcon(image));
+                originalImageSize=getImageSize(image);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -120,6 +131,7 @@ public class ImageGUI extends JFrame {
         BufferedImage quantizedImage = UniformQuantization.quantize(image,(int) uniformSpinnerModel.getValue());
         currentImage=quantizedImage;
         imageLabel.setIcon(new ImageIcon(quantizedImage));
+        uniformImageSize=getImageSize(quantizedImage);
 
     }
     private void kMean() {
@@ -127,5 +139,41 @@ public class ImageGUI extends JFrame {
         BufferedImage quantizedImage = KMeansQuantizer.quantize(image, (int) kMeansSpinnerModel.getValue());
         currentImage=quantizedImage;
         imageLabel.setIcon(new ImageIcon(quantizedImage));
+        kMeanImageSize=getImageSize(quantizedImage);
     }
+    private Integer getImageSize(BufferedImage quantizedImage) {
+        ByteArrayOutputStream tmp = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(quantizedImage, "png", tmp);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            tmp.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return tmp.size()/1024;
+
+    }
+    private void compareAlgorithms() {
+        kMean();
+        uniform();
+        restoreOriginal();
+        int difference = Math.abs(kMeanImageSize-uniformImageSize);
+        String theBetterAlgorithm="K_Means";
+        String theWorseAlgorithm="Uniform";
+        if(kMeanImageSize>uniformImageSize){
+            theBetterAlgorithm="Uniform";
+            theWorseAlgorithm="K_Means";
+        }
+        JOptionPane.showMessageDialog
+                (null, "the size of the original image is" +
+                " "+originalImageSize+" kb"+"\n"+"the size of quantized image that use K_Means algorithm is"
+                +" "+kMeanImageSize+" kb"+"\n"+"the size of quantized image that use Uniform algorithm is"
+                +" "+uniformImageSize+" kb"+"\n"
+                +theBetterAlgorithm+" is  better than "+theWorseAlgorithm+" by "+difference+" kb");
+
+    }
+
 }
