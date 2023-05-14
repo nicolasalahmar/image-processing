@@ -115,7 +115,7 @@ public class ImageGUI extends JFrame {
     }
     public void loadImage() {
 
-        JFileChooser fileChooser = new JFileChooser("C:\\Users\\Jony\\Pictures\\image_processing");
+        JFileChooser fileChooser = new JFileChooser(image_route.image_route);
         int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             try {
