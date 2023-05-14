@@ -2,13 +2,17 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
 import color_quantization_algorithms.*;
 
 public class ImageGUI extends JFrame {
     private JLabel imageLabel;
-    private JButton uniformButton, KmeansButton, loadImageButton, restoreOriginal;
+    private JButton uniformButton, KmeansButton, loadImageButton, restoreOriginal,saveImageButton;
+    JFileChooser fileChooser = new JFileChooser();
+
+    BufferedImage currentImage;
     JLabel kMeanLabel = new JLabel("clusters number");
     JLabel uniformLabel = new JLabel("colors number");
     private BufferedImage image;
@@ -34,6 +38,7 @@ public class ImageGUI extends JFrame {
         init_KmeansSpinner();
         init_UniformSpinner();
         init_loadImageButton();
+        init_saveImageButton();
         init_restoreOriginalImageButton();
 
         // Add the components to the frame
@@ -50,6 +55,11 @@ public class ImageGUI extends JFrame {
         loadImageButton.addActionListener(e -> loadImage());
         controlPanel.add(loadImageButton);
     }
+    public void init_saveImageButton() {
+        saveImageButton = new JButton("save image");
+        saveImageButton.addActionListener(e -> saveImage());
+        controlPanel.add(saveImageButton);
+    }
     public void init_KmeansButton() {
         KmeansButton = new JButton("K_Means");
         KmeansButton.addActionListener(e -> kMean());
@@ -57,7 +67,7 @@ public class ImageGUI extends JFrame {
     }
     public void init_restoreOriginalImageButton() {
         restoreOriginal = new JButton("restore original");
-        restoreOriginal.addActionListener(e -> imageLabel.setIcon(new ImageIcon(image)));
+        restoreOriginal.addActionListener(e -> restoreOriginal());
         controlPanel.add(restoreOriginal);
     }
     public void init_KmeansSpinner(){
@@ -66,6 +76,7 @@ public class ImageGUI extends JFrame {
         controlPanel.add(kMeanLabel);
         controlPanel.add(kMeansSpinner);
     }
+
     public void init_UniformSpinner(){
 
         uniformSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
@@ -86,14 +97,35 @@ public class ImageGUI extends JFrame {
             }
         }
     }
-    private void uniform()  {
+    public void saveImage() {
 
+        int result = fileChooser.showSaveDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            try {
+                File file = fileChooser.getSelectedFile();
+                ImageIO.write(currentImage,"png", file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    private void restoreOriginal()  {
+        fileChooser.setSelectedFile(new File("original.png"));
+        currentImage=image;
+        imageLabel.setIcon(new ImageIcon(image));
+
+    }
+    private void uniform()  {
+        fileChooser.setSelectedFile(new File("uniform.png"));
         BufferedImage quantizedImage = UniformQuantization.quantize(image,(int) uniformSpinnerModel.getValue());
+        currentImage=quantizedImage;
         imageLabel.setIcon(new ImageIcon(quantizedImage));
 
     }
     private void kMean() {
-        BufferedImage bufferedImage = KMeansQuantizer.quantize(image, (int) kMeansSpinnerModel.getValue());
-        imageLabel.setIcon(new ImageIcon(bufferedImage));
+        fileChooser.setSelectedFile(new File("kMean.png"));
+        BufferedImage quantizedImage = KMeansQuantizer.quantize(image, (int) kMeansSpinnerModel.getValue());
+        currentImage=quantizedImage;
+        imageLabel.setIcon(new ImageIcon(quantizedImage));
     }
 }
