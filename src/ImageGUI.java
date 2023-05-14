@@ -1,29 +1,40 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.Color;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import color_quantization_algorithms.*;
 
 public class ImageGUI extends JFrame {
     private JLabel imageLabel;
-    private JButton uniformButton, KmeansButton, loadImageButton, restoreOriginal,saveImageButton,compareButton;
+    private JButton uniformButton, KmeansButton, loadImageButton, restoreOriginal,saveImageButton,compareButton,
+    colorPaletteButton;
     int originalImageSize,kMeanImageSize,uniformImageSize;
     JFileChooser fileChooser = new JFileChooser();
 
     BufferedImage currentImage;
     JLabel kMeanLabel = new JLabel("clusters number");
     JLabel uniformLabel = new JLabel("colors number");
+    JLabel colorPaletteLabel = new JLabel("colors palette number");
     private BufferedImage image;
     SpinnerModel kMeansSpinnerModel, uniformSpinnerModel;
-    JSpinner kMeansSpinner;
-    JSpinner uniformSpinner;
+    JSpinner kMeansSpinner,uniformSpinner;
     JPanel controlPanel;
+    JPanel colorPalettePanel = new JPanel(new GridLayout(0, 5));
+    JFrame colorPaletteFrame = new JFrame("Color Palette");
+
+
 
     public ImageGUI() {
+
+
+        colorPaletteFrame.setSize(300, 200);
+
         // Set up the frame
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(400, 400);
@@ -44,16 +55,23 @@ public class ImageGUI extends JFrame {
         init_loadImageButton();
         init_saveImageButton();
         init_CompareButton();
+        init_ColorPaletteButton();
         init_restoreOriginalImageButton();
 
         // Add the components to the frame
         add(imageLabel, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
+        add(colorPalettePanel,BorderLayout.NORTH);
     }
     public void init_UniformButton() {
         uniformButton = new JButton("Uniform");
         uniformButton.addActionListener(e -> uniform());
         controlPanel.add(uniformButton);
+    }
+    public void init_ColorPaletteButton() {
+        colorPaletteButton = new JButton("show color palette");
+        colorPaletteButton.addActionListener(e -> showColorPalette());
+        controlPanel.add(colorPaletteButton);
     }
     public void init_CompareButton() {
         compareButton = new JButton("compare algorithms");
@@ -80,6 +98,7 @@ public class ImageGUI extends JFrame {
         restoreOriginal.addActionListener(e -> restoreOriginal());
         controlPanel.add(restoreOriginal);
     }
+
     public void init_KmeansSpinner(){
         kMeansSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
         kMeansSpinner = new JSpinner(kMeansSpinnerModel);
@@ -103,6 +122,7 @@ public class ImageGUI extends JFrame {
                 image = ImageIO.read(fileChooser.getSelectedFile());
                 imageLabel.setIcon(new ImageIcon(image));
                 originalImageSize=getImageSize(image);
+                currentImage=image;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -161,8 +181,7 @@ public class ImageGUI extends JFrame {
         uniform();
         restoreOriginal();
         int difference = Math.abs(kMeanImageSize-uniformImageSize);
-        String theBetterAlgorithm="K_Means";
-        String theWorseAlgorithm="Uniform";
+        String theBetterAlgorithm="K_Means", theWorseAlgorithm="Uniform";
         if(kMeanImageSize>uniformImageSize){
             theBetterAlgorithm="Uniform";
             theWorseAlgorithm="K_Means";
@@ -173,6 +192,26 @@ public class ImageGUI extends JFrame {
                 +" "+kMeanImageSize+" kb"+"\n"+"the size of quantized image that use Uniform algorithm is"
                 +" "+uniformImageSize+" kb"+"\n"
                 +theBetterAlgorithm+" is  better than "+theWorseAlgorithm+" by "+difference+" kb");
+
+    }
+    private void showColorPalette(){
+        colorPalettePanel.removeAll();colorPaletteFrame.getContentPane().removeAll();
+        ColorPalette colorPalette =new ColorPalette();
+        List<Color> palette = colorPalette.createColorPalette(currentImage,10);
+        for (Color color : palette) {
+            JLabel label = new JLabel();
+            label.setOpaque(true);
+            label.setBackground(color);
+
+            colorPalettePanel.add(label);
+
+            // Add the color palette panel to the frame
+
+
+        }
+
+        colorPaletteFrame.getContentPane().add(colorPalettePanel);
+        colorPaletteFrame.setVisible(true);
 
     }
 
