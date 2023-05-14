@@ -8,6 +8,8 @@ out/
 /vcs.xml
 /modules.xml
 misc.xml
+src/image_route.java
+images
 
 image_proseccing.iml
 image-processing.iml
