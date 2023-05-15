@@ -13,7 +13,7 @@ import color_quantization_algorithms.*;
 public class ImageGUI extends JFrame {
     private JLabel imageLabel;
     private JButton uniformButton, KmeansButton, loadImageButton, restoreOriginal, saveImageButton, compareButton,
-            colorPaletteButton;
+            colorPaletteButton,colorHistogramButton;
     int originalImageSize, kMeanImageSize, uniformImageSize;
     JFileChooser fileChooser = new JFileChooser();
 
@@ -27,6 +27,7 @@ public class ImageGUI extends JFrame {
     JPanel controlPanel;
     JPanel colorPalettePanel = new JPanel(new GridLayout(0, 5));
     JFrame colorPaletteFrame = new JFrame("Color Palette");
+    JFrame colorHistogramFrame = new JFrame("Color Histogram");
     long kMeanImageTime = 0, uniformImageTime = 0;
 
 
@@ -46,6 +47,8 @@ public class ImageGUI extends JFrame {
 
         // Create the control panel
         controlPanel = new JPanel();
+        controlPanel.setBackground(Color.lightGray);
+        controlPanel.setSize(1500,500);
         // initialize buttons
         init_UniformButton();
         init_KmeansButton();
@@ -55,6 +58,7 @@ public class ImageGUI extends JFrame {
         init_saveImageButton();
         init_CompareButton();
         init_ColorPaletteButton();
+        init_ColorHistogramButton();
         init_restoreOriginalImageButton();
 
         // Add the components to the frame
@@ -73,6 +77,11 @@ public class ImageGUI extends JFrame {
         colorPaletteButton = new JButton("show color palette");
         colorPaletteButton.addActionListener(e -> showColorPalette());
         controlPanel.add(colorPaletteButton);
+    }
+    public void init_ColorHistogramButton() {
+        colorHistogramButton = new JButton("show color histogram");
+        colorHistogramButton.addActionListener(e -> showColorHistogram());
+        controlPanel.add(colorHistogramButton);
     }
 
     public void init_CompareButton() {
@@ -248,6 +257,22 @@ public class ImageGUI extends JFrame {
 
         colorPaletteFrame.getContentPane().add(colorPalettePanel);
         colorPaletteFrame.setVisible(true);
+
+    }
+    private void showColorHistogram() {
+        colorPalettePanel.removeAll();
+        colorPaletteFrame.getContentPane().removeAll();
+        colorHistogramFrame.getContentPane().removeAll();
+        ColorPalette colorPalette = new ColorPalette();
+        List<Color> palette = colorPalette.createColorPalette(currentImage, 10);
+
+        ColorHistogram histogramPanel = new ColorHistogram(palette);
+        histogramPanel.createColorHistogram(currentImage);
+        colorHistogramFrame.setTitle("Color Histogram");
+        colorHistogramFrame.add(histogramPanel);
+        colorHistogramFrame.pack();
+        colorHistogramFrame.setLocationRelativeTo(null);
+        colorHistogramFrame.setVisible(true);
 
     }
 
