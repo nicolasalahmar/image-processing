@@ -37,7 +37,6 @@ public class ImageGUI extends JFrame {
 
         // Set up the frame
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 400);
         setTitle("Image GUI");
 
         // Create the components
@@ -48,7 +47,9 @@ public class ImageGUI extends JFrame {
         // Create the control panel
         controlPanel = new JPanel();
         controlPanel.setBackground(Color.lightGray);
-        controlPanel.setSize(1500,500);
+        controlPanel.setPreferredSize(new Dimension(getWidth(), 65));
+
+
         // initialize buttons
         init_UniformButton();
         init_KmeansButton();

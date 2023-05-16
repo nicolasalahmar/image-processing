@@ -59,7 +59,9 @@ public class ColorHistogram extends JPanel {
 
             g.drawString("" + freq, x + 5, y - 2);
 
+
         }
+
     }
 
     private int getMaxFrequency() {
