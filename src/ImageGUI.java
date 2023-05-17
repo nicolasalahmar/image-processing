@@ -12,23 +12,25 @@ import color_quantization_algorithms.*;
 
 public class ImageGUI extends JFrame {
     private JLabel imageLabel;
-    private JButton uniformButton, KmeansButton, loadImageButton, restoreOriginal, saveImageButton, compareButton,
+    private JButton uniformButton, KmeansButton,MedianCutButton, loadImageButton, restoreOriginal, saveImageButton, compareButton,compareButton2,
             colorPaletteButton,colorHistogramButton;
-    int originalImageSize, kMeanImageSize, uniformImageSize;
+    int originalImageSize, kMeanImageSize, uniformImageSize,medianCutImageSize;
     JFileChooser fileChooser = new JFileChooser();
 
     BufferedImage currentImage;
     JLabel kMeanLabel = new JLabel("clusters number");
     JLabel uniformLabel = new JLabel("colors number");
+    JLabel medianLabel = new JLabel("median number");
+
     JLabel colorPaletteLabel = new JLabel("colors palette number");
     private BufferedImage image;
-    SpinnerModel kMeansSpinnerModel, uniformSpinnerModel;
-    JSpinner kMeansSpinner, uniformSpinner;
+    SpinnerModel kMeansSpinnerModel, uniformSpinnerModel, MedianCutSpinnerModel;
+    JSpinner kMeansSpinner, uniformSpinner, medianSpinner;
     JPanel controlPanel;
     JPanel colorPalettePanel = new JPanel(new GridLayout(0, 5));
     JFrame colorPaletteFrame = new JFrame("Color Palette");
     JFrame colorHistogramFrame = new JFrame("Color Histogram");
-    long kMeanImageTime = 0, uniformImageTime = 0;
+    long kMeanImageTime = 0, uniformImageTime = 0,medianCutImageTime =0;
 
 
     public ImageGUI() {
@@ -53,11 +55,14 @@ public class ImageGUI extends JFrame {
         // initialize buttons
         init_UniformButton();
         init_KmeansButton();
+        init_MedianButton();
         init_KmeansSpinner();
         init_UniformSpinner();
+        init_MedianSpinner();
         init_loadImageButton();
         init_saveImageButton();
         init_CompareButton();
+        init_CompareButton2();
         init_ColorPaletteButton();
         init_ColorHistogramButton();
         init_restoreOriginalImageButton();
@@ -88,7 +93,13 @@ public class ImageGUI extends JFrame {
     public void init_CompareButton() {
         compareButton = new JButton("compare algorithms");
         compareButton.addActionListener(e -> compareAlgorithms());
-        controlPanel.add(compareButton);
+        //controlPanel.add(compareButton);
+    }
+
+    public void init_CompareButton2() {
+        compareButton2 = new JButton("compare algorithms 2");
+        compareButton2.addActionListener(e -> compareAlgorithms2());
+        controlPanel.add(compareButton2);
     }
 
     public void init_loadImageButton() {
@@ -109,6 +120,13 @@ public class ImageGUI extends JFrame {
         controlPanel.add(KmeansButton);
     }
 
+    public void init_MedianButton() {
+        MedianCutButton = new JButton("Median Cut");
+        MedianCutButton.addActionListener(e -> median_cut());
+        controlPanel.add(MedianCutButton);
+    }
+
+
     public void init_restoreOriginalImageButton() {
         restoreOriginal = new JButton("restore original");
         restoreOriginal.addActionListener(e -> restoreOriginal());
@@ -128,6 +146,14 @@ public class ImageGUI extends JFrame {
         uniformSpinner = new JSpinner(uniformSpinnerModel);
         controlPanel.add(uniformLabel);
         controlPanel.add(uniformSpinner);
+    }
+
+    public void init_MedianSpinner() {
+
+        MedianCutSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
+        medianSpinner = new JSpinner(MedianCutSpinnerModel);
+        controlPanel.add(medianLabel);
+        controlPanel.add(medianSpinner);
     }
 
     public void loadImage() {
@@ -159,6 +185,7 @@ public class ImageGUI extends JFrame {
     }
 
     private void restoreOriginal() {
+
         fileChooser.setSelectedFile(new File("original.png"));
         currentImage = image;
         imageLabel.setIcon(new ImageIcon(image));
@@ -186,6 +213,36 @@ public class ImageGUI extends JFrame {
         currentImage = quantizedImage;
         imageLabel.setIcon(new ImageIcon(quantizedImage));
         kMeanImageSize = getImageSize(quantizedImage);
+    }
+
+    private void median_cut() {
+
+        fileChooser.setSelectedFile(new File("median_cut.png"));
+        long startTime = System.nanoTime();
+
+        int height = image.getHeight();
+        int width = image.getWidth();
+        int[][] flattenedImgArray = new int[height * width][5];
+
+        int index = 0;
+        for (int rIndex = 0; rIndex < height; rIndex++) {
+            for (int cIndex = 0; cIndex < width; cIndex++) {
+                int rgb = image.getRGB(cIndex, rIndex);
+                int r = (rgb >> 16) & 0xFF;
+                int g = (rgb >> 8) & 0xFF;
+                int b = rgb & 0xFF;
+                flattenedImgArray[index] = new int[]{r, g, b, rIndex, cIndex};
+                index++;
+            }
+        }
+
+        BufferedImage quantizedImage = MedianCutColorQuantization.splitIntoBuckets(image, flattenedImgArray,(int) medianSpinner.getValue());
+
+        long endTime = System.nanoTime();
+        medianCutImageTime = endTime - startTime;
+        currentImage = quantizedImage;
+        imageLabel.setIcon(new ImageIcon(quantizedImage));
+        medianCutImageSize = getImageSize(quantizedImage);
     }
 
     private Integer getImageSize(BufferedImage quantizedImage) {
@@ -238,6 +295,63 @@ public class ImageGUI extends JFrame {
                         + theBetterAlgorithmInTime + " is  better than " + theWorseAlgorithmInTime + " in time by " + (double) Math.round(timeDifference * 100) / 100 + " s");
 
     }
+
+    private void compareAlgorithms2() {
+        kMean();
+        uniform();
+        median_cut();
+        restoreOriginal();
+
+        int sizeDifferenceKMeanUniform = Math.abs(kMeanImageSize - uniformImageSize);
+        int sizeDifferenceKMeanMedianCut = Math.abs(kMeanImageSize - medianCutImageSize);
+        int sizeDifferenceUniformMedianCut = Math.abs(uniformImageSize - medianCutImageSize);
+
+        double timeDifferenceKMeanUniform = Math.abs(kMeanImageTime - uniformImageTime) / 1000000000.0;
+        double timeDifferenceKMeanMedianCut = Math.abs(kMeanImageTime - medianCutImageTime) / 1000000000.0;
+        double timeDifferenceUniformMedianCut = Math.abs(uniformImageTime - medianCutImageTime) / 1000000000.0;
+
+        String bestAlgorithmInSize = "";
+        String bestAlgorithmInTime = "";
+
+        if (kMeanImageSize <= uniformImageSize && kMeanImageSize <= medianCutImageSize) {
+            bestAlgorithmInSize = "K Means";
+        } else if (uniformImageSize <= kMeanImageSize && uniformImageSize <= medianCutImageSize) {
+            bestAlgorithmInSize = "Uniform";
+        } else if (medianCutImageSize <= kMeanImageSize && medianCutImageSize <= uniformImageSize) {
+            bestAlgorithmInSize = "Median Cut";
+        }
+
+        if (kMeanImageTime <= uniformImageTime && kMeanImageTime <= medianCutImageTime) {
+            bestAlgorithmInTime = "K Means";
+        } else if (uniformImageTime <= kMeanImageTime && uniformImageTime <= medianCutImageTime) {
+            bestAlgorithmInTime = "Uniform";
+        } else if (medianCutImageTime <= kMeanImageTime && medianCutImageTime <= uniformImageTime) {
+            bestAlgorithmInTime = "Median Cut";
+        }
+
+        double kMeanTimeInSeconds = (double) kMeanImageTime / 1000000000.0;
+        double uniformTimeInSeconds = (double) uniformImageTime / 1000000000.0;
+        double medianCutTimeInSeconds = (double) medianCutImageTime / 1000000000.0;
+
+        String message = "Comparison Results:\n\n";
+        message += "Original Image Size: " + originalImageSize + " kb\n\n";
+        message += "K Means Algorithm:\n";
+        message += "- Quantized Image Size: " + kMeanImageSize + " kb\n";
+        message += "- Execution Time: " + kMeanTimeInSeconds + " s\n\n";
+        message += "Uniform Algorithm:\n";
+        message += "- Quantized Image Size: " + uniformImageSize + " kb\n";
+        message += "- Execution Time: " + uniformTimeInSeconds + " s\n\n";
+        message += "Median Cut Algorithm:\n";
+        message += "- Quantized Image Size: " + medianCutImageSize + " kb\n";
+        message += "- Execution Time: " + medianCutTimeInSeconds + " s\n\n";
+        message += "Size Comparison:\n";
+        message += "- The best algorithm in terms of size is: " + bestAlgorithmInSize + "\n\n";
+        message += "Execution Time Comparison:\n";
+        message += "- The best algorithm in terms of execution time is: " + bestAlgorithmInTime + "\n";
+
+        JOptionPane.showMessageDialog(null, message);
+    }
+
 
     private void showColorPalette() {
         colorPalettePanel.removeAll();
