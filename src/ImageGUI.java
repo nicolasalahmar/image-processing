@@ -12,10 +12,10 @@ import color_quantization_algorithms.*;
 
 public class ImageGUI extends JFrame {
     private JLabel imageLabel;
-    private JButton uniformButton, KmeansButton,MedianCutButton, loadImageButton, restoreOriginal, saveImageButton, compareButton,compareButton2,
+    private JButton uniformButton, KmeansButton,MedianCutButton, loadImageButton, restoreOriginal, saveImageButton, saveIndexedImageButton, compareButton,compareButton2,
             colorPaletteButton,colorHistogramButton;
     int originalImageSize, kMeanImageSize, uniformImageSize,medianCutImageSize;
-    JFileChooser fileChooser = new JFileChooser();
+    JFileChooser fileChooser = new JFileChooser(image_route.image_route);
 
     BufferedImage currentImage;
     JLabel kMeanLabel = new JLabel("clusters number");
@@ -59,6 +59,7 @@ public class ImageGUI extends JFrame {
 
         init_loadImageButton();
         init_saveImageButton();
+        init_saveIndexedImageButton();
         init_CompareButton();
         init_CompareButton2();
         init_ColorPaletteButton();
@@ -112,6 +113,16 @@ public class ImageGUI extends JFrame {
         controlPanel.add(saveImageButton);
     }
 
+    public void init_saveIndexedImageButton() {
+        saveIndexedImageButton = new JButton("save as indexed image");
+        saveIndexedImageButton.addActionListener(e -> saveIndexedImage());
+        controlPanel.add(saveIndexedImageButton);
+    }
+
+    public void indexed(indexed_image i){
+        imageLabel.setIcon(new ImageIcon(i.constructed_image));
+    }
+
     public void init_KmeansButton() {
         KmeansButton = new JButton("K_Means");
         KmeansButton.addActionListener(e -> kMean());
@@ -155,8 +166,6 @@ public class ImageGUI extends JFrame {
     }
 
     public void loadImage() {
-
-        JFileChooser fileChooser = new JFileChooser(image_route.image_route);
         int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             try {
@@ -176,6 +185,19 @@ public class ImageGUI extends JFrame {
             try {
                 File file = fileChooser.getSelectedFile();
                 ImageIO.write(currentImage, "png", file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void saveIndexedImage() {
+        int result = fileChooser.showSaveDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            try {
+                File file = fileChooser.getSelectedFile();
+                indexed_image indexed = new indexed_image(currentImage);
+                ImageIO.write(indexed.constructed_image, "png", file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
