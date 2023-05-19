@@ -354,41 +354,67 @@ public class ImageGUI extends JFrame {
 
 
     private void showColorPalette() {
+        // Clear the color palette panel.
         colorPalettePanel.removeAll();
+
+        // Clear the content pane of the color palette frame.
         colorPaletteFrame.getContentPane().removeAll();
         ColorPalette colorPalette = new ColorPalette();
+
         List<Color> palette = colorPalette.createColorPalette(currentImage, 10);
+
         for (Color color : palette) {
+
             JLabel label = new JLabel();
+
+            //the label will fill its entire background with its background color.
+            // If the label were not opaque, it would be transparent
+            // and you would be able to see through it to the background behind it
             label.setOpaque(true);
+
+            // Set the label's background to the current color.
             label.setBackground(color);
 
+            // Add the label to the color palette panel.
             colorPalettePanel.add(label);
-
-            // Add the color palette panel to the frame
-
-
         }
 
+        // Add the color palette panel to the frame.
         colorPaletteFrame.getContentPane().add(colorPalettePanel);
-        colorPaletteFrame.setVisible(true);
 
+        colorPaletteFrame.setVisible(true);
     }
+
     private void showColorHistogram() {
+        // Clear the color palette panel.
         colorPalettePanel.removeAll();
+
+        // Clear the content pane of the color palette frame.
         colorPaletteFrame.getContentPane().removeAll();
+
+        // Clear the content pane of the color histogram frame.
         colorHistogramFrame.getContentPane().removeAll();
+
         ColorPalette colorPalette = new ColorPalette();
+
         List<Color> palette = colorPalette.createColorPalette(currentImage, 10);
 
+        // Create a new color histogram panel.
         ColorHistogram histogramPanel = new ColorHistogram(palette);
-        histogramPanel.createColorHistogram(currentImage);
-        colorHistogramFrame.setTitle("Color Histogram");
-        colorHistogramFrame.add(histogramPanel);
-        colorHistogramFrame.pack();
-        colorHistogramFrame.setLocationRelativeTo(null);
-        colorHistogramFrame.setVisible(true);
 
+        histogramPanel.createColorHistogram(currentImage);
+
+        colorHistogramFrame.setTitle("Color Histogram");
+
+        // Add the color histogram panel to the color histogram frame.
+        colorHistogramFrame.add(histogramPanel);
+
+        colorHistogramFrame.pack();
+
+        // Set the location of the color histogram frame to the center of the screen.
+        colorHistogramFrame.setLocationRelativeTo(null);
+
+        colorHistogramFrame.setVisible(true);
     }
 
 }
