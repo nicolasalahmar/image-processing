@@ -7,7 +7,16 @@ import java.util.Random;
 
 public class KMeansQuantizer {
 
-    public static BufferedImage quantize(BufferedImage image, int k) {
+    public static class labels_centroids{
+        public ArrayList<Color> centroids;
+        int[] labels;
+        labels_centroids(ArrayList<Color> centroids, int[] labels){
+            this.centroids = centroids;
+            this.labels = labels;
+        }
+    }
+
+    public static labels_centroids init_centroids(BufferedImage image, int k){
         // Initialize random centroids
         ArrayList<Color> centroids = new ArrayList<>();
         Random rand = new Random();
@@ -58,6 +67,14 @@ public class KMeansQuantizer {
                 centroids.set(i, new Color(avgR, avgG, avgB));
             }
         }
+        return new labels_centroids(centroids, labels);
+    }
+
+    public static BufferedImage quantize(BufferedImage image, int k) {
+        labels_centroids temp = init_centroids(image, k);
+
+        ArrayList<Color> centroids = temp.centroids;
+        int[] labels = temp.labels;
 
         // Create output image
         BufferedImage output = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
@@ -71,7 +88,7 @@ public class KMeansQuantizer {
         return output;
     }
 
-    private static double distance(Color c1, Color c2) {
+    public static double distance(Color c1, Color c2) {
         double rDiff = c1.getRed() - c2.getRed();
         double gDiff = c1.getGreen() - c2.getGreen();
         double bDiff = c1.getBlue() - c2.getBlue();

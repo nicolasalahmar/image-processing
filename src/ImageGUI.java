@@ -53,12 +53,10 @@ public class ImageGUI extends JFrame {
 
 
         // initialize buttons
-        init_UniformButton();
-        init_KmeansButton();
-        init_MedianButton();
-        init_KmeansSpinner();
-        init_UniformSpinner();
-        init_MedianSpinner();
+        init_UniformButton();init_UniformSpinner();
+        init_KmeansButton();init_KmeansSpinner();
+        init_MedianButton();init_MedianSpinner();
+
         init_loadImageButton();
         init_saveImageButton();
         init_CompareButton();
