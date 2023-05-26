@@ -1,20 +1,22 @@
+import color_quantization_algorithms.KMeansQuantizer;
+import color_quantization_algorithms.MedianCutColorQuantization;
+import color_quantization_algorithms.UniformQuantization;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.Color;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
-import color_quantization_algorithms.*;
+import java.util.Objects;
 
 public class ImageGUI extends JFrame {
     private JLabel imageLabel;
-    private JButton uniformButton, KmeansButton,MedianCutButton, loadImageButton, restoreOriginal, saveImageButton, saveIndexedImageButton, compareButton,compareButton2,
-            colorPaletteButton,colorHistogramButton;
-    int originalImageSize, kMeanImageSize, uniformImageSize,medianCutImageSize;
+    private JButton uniformButton, KmeansButton, MedianCutButton, loadImageButton, restoreOriginal, saveImageButton, saveIndexedImageButton, compareButton, compareButton2,
+            colorPaletteButton, colorHistogramButton;
+    int originalImageSize, kMeanImageSize, uniformImageSize, medianCutImageSize;
     JFileChooser fileChooser = new JFileChooser(image_route.image_route);
 
     BufferedImage currentImage;
@@ -30,7 +32,7 @@ public class ImageGUI extends JFrame {
     JPanel colorPalettePanel = new JPanel(new GridLayout(0, 5));
     JFrame colorPaletteFrame = new JFrame("Color Palette");
     JFrame colorHistogramFrame = new JFrame("Color Histogram");
-    long kMeanImageTime = 0, uniformImageTime = 0,medianCutImageTime =0;
+    long kMeanImageTime = 0, uniformImageTime = 0, medianCutImageTime = 0;
 
 
     public ImageGUI() {
@@ -53,11 +55,14 @@ public class ImageGUI extends JFrame {
 
 
         // initialize buttons
-        init_UniformButton();init_UniformSpinner();
-        init_KmeansButton();init_KmeansSpinner();
+        init_UniformButton();
+        init_UniformSpinner();
+        init_KmeansButton();
+        init_KmeansSpinner();
         init_MedianButton();init_MedianSpinner();
 
         init_loadImageButton();
+        init_findSimilarImagesButton();
         init_saveImageButton();
         init_saveIndexedImageButton();
         init_CompareButton();
@@ -83,6 +88,7 @@ public class ImageGUI extends JFrame {
         colorPaletteButton.addActionListener(e -> showColorPalette());
         controlPanel.add(colorPaletteButton);
     }
+
     public void init_ColorHistogramButton() {
         colorHistogramButton = new JButton("show color histogram");
         colorHistogramButton.addActionListener(e -> showColorHistogram());
@@ -107,6 +113,13 @@ public class ImageGUI extends JFrame {
         controlPanel.add(loadImageButton);
     }
 
+    public void init_findSimilarImagesButton() {
+        JButton findSimilarImagesButton;
+        findSimilarImagesButton = new JButton("find similar images");
+        findSimilarImagesButton.addActionListener(e -> findSimilarImages());
+        controlPanel.add(findSimilarImagesButton);
+    }
+
     public void init_saveImageButton() {
         saveImageButton = new JButton("save image");
         saveImageButton.addActionListener(e -> saveImage());
@@ -119,7 +132,7 @@ public class ImageGUI extends JFrame {
         controlPanel.add(saveIndexedImageButton);
     }
 
-    public void indexed(indexed_image i){
+    public void indexed(indexed_image i) {
         imageLabel.setIcon(new ImageIcon(i.constructed_image));
     }
 
@@ -179,6 +192,54 @@ public class ImageGUI extends JFrame {
         }
     }
 
+    public double[] image_to_vector(File file) throws IOException {
+        image = ImageIO.read(file);
+        originalImageSize = getImageSize(image);
+        currentImage = image;
+        ColorPalette colorPalette = new ColorPalette();
+        List<Color> palette = colorPalette.createColorPalette(currentImage, 10);
+        return PaletteVector.toLabVector(palette);
+    }
+
+    public void findSimilarImages() {
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            try {
+                double[] lab_paletteVector1 = image_to_vector(fileChooser.getSelectedFile());
+                imageLabel.setIcon(new ImageIcon(image));
+                File folder = new File(image_route.indexed_image_route);
+                for (File file : Objects.requireNonNull(folder.listFiles())) {
+                    if (file.isFile()) {
+                        double[] lab_paletteVector2 = image_to_vector(file);
+                       // System.out.printf(file.getName() + ":  %.2f\n", PaletteVector.computeCosineSimilarity(lab_paletteVector1, lab_paletteVector2));
+                       // System.out.printf(file.getName() + ":  %.2f\n", PaletteVector.euclideanDistance(lab_paletteVector1, lab_paletteVector2));
+
+                        if (PaletteVector.computeCosineSimilarity(lab_paletteVector1, lab_paletteVector2) >0.75) {
+                               System.out.println(file.getName());
+                               System.out.println("--------------------------");
+                            try {
+                                ImageIO.write(currentImage, "png", new File(image_route.output1 + file.getName()));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public void searchByColor() {
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            //TODO rita will create a method that searches for a collection that contains a specific color
+
+        }
+    }
+
     public void saveImage() {
         int result = fileChooser.showSaveDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
@@ -234,6 +295,7 @@ public class ImageGUI extends JFrame {
         imageLabel.setIcon(new ImageIcon(quantizedImage));
         kMeanImageSize = getImageSize(quantizedImage);
     }
+
 
     private void median_cut() {
 
