@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class ImageGUI extends JFrame {
-    private String formatName="bmp";
-    private JLabel imageLabel;
-    private JButton uniformButton, KmeansButton, MedianCutButton, loadImageButton, restoreOriginal, saveImageButton, saveIndexedImageButton, compareButton, compareButton2,
-            colorPaletteButton, colorHistogramButton;
+    private final String formatName="bmp";
+    private final JLabel imageLabel;
+    private JButton MedianCutButton;
+    private JButton restoreOriginal;
     int originalImageSize, kMeanImageSize, uniformImageSize, medianCutImageSize;
     JFileChooser fileChooser = new JFileChooser(image_route.image_route);
 
@@ -79,37 +79,37 @@ public class ImageGUI extends JFrame {
     }
 
     public void init_UniformButton() {
-        uniformButton = new JButton("Uniform");
+        JButton uniformButton = new JButton("Uniform");
         uniformButton.addActionListener(e -> uniform());
         controlPanel.add(uniformButton);
     }
 
     public void init_ColorPaletteButton() {
-        colorPaletteButton = new JButton("show color palette");
+        JButton colorPaletteButton = new JButton("show color palette");
         colorPaletteButton.addActionListener(e -> showColorPalette());
         controlPanel.add(colorPaletteButton);
     }
 
     public void init_ColorHistogramButton() {
-        colorHistogramButton = new JButton("show color histogram");
+        JButton colorHistogramButton = new JButton("show color histogram");
         colorHistogramButton.addActionListener(e -> showColorHistogram());
         controlPanel.add(colorHistogramButton);
     }
 
     public void init_CompareButton() {
-        compareButton = new JButton("compare algorithms");
+        JButton compareButton = new JButton("compare algorithms");
         compareButton.addActionListener(e -> compareAlgorithms());
         controlPanel.add(compareButton);
     }
 
     public void init_CompareButton2() {
-        compareButton2 = new JButton("compare algorithms 2");
+        JButton compareButton2 = new JButton("compare algorithms 2");
         compareButton2.addActionListener(e -> compareAlgorithms2());
         controlPanel.add(compareButton2);
     }
 
     public void init_loadImageButton() {
-        loadImageButton = new JButton("load image");
+        JButton loadImageButton = new JButton("load image");
         loadImageButton.addActionListener(e -> loadImage());
         controlPanel.add(loadImageButton);
     }
@@ -122,13 +122,13 @@ public class ImageGUI extends JFrame {
     }
 
     public void init_saveImageButton() {
-        saveImageButton = new JButton("save image");
+        JButton saveImageButton = new JButton("save image");
         saveImageButton.addActionListener(e -> saveImage());
         controlPanel.add(saveImageButton);
     }
 
     public void init_saveIndexedImageButton() {
-        saveIndexedImageButton = new JButton("save as indexed image");
+        JButton saveIndexedImageButton = new JButton("save as indexed image");
         saveIndexedImageButton.addActionListener(e -> saveIndexedImage());
         controlPanel.add(saveIndexedImageButton);
     }
@@ -138,9 +138,9 @@ public class ImageGUI extends JFrame {
     }
 
     public void init_KmeansButton() {
-        KmeansButton = new JButton("K_Means");
-        KmeansButton.addActionListener(e -> kMean());
-        controlPanel.add(KmeansButton);
+        JButton kmeansButton = new JButton("K_Means");
+        kmeansButton.addActionListener(e -> kMean());
+        controlPanel.add(kmeansButton);
     }
 
     public void init_MedianButton() {
@@ -225,7 +225,7 @@ public class ImageGUI extends JFrame {
                                System.out.println(file.getName());
                                System.out.println("--------------------------");
                             try {
-                                ImageIO.write(currentImage, formatName, new File(image_route.output1 + file.getName()));
+                                ImageIO.write(currentImage, formatName, new File(image_route.output1 ,file.getName()));
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
