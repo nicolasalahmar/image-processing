@@ -13,7 +13,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class ImageGUI extends JFrame {
-    private final JLabel imageLabel;
+    private String formatName="bmp";
+    private JLabel imageLabel;
+    private JButton uniformButton, KmeansButton, MedianCutButton, loadImageButton, restoreOriginal, saveImageButton, saveIndexedImageButton, compareButton, compareButton2,
+            colorPaletteButton, colorHistogramButton;
     int originalImageSize, kMeanImageSize, uniformImageSize, medianCutImageSize;
     JFileChooser fileChooser = new JFileChooser(image_route.image_route);
 
@@ -76,37 +79,37 @@ public class ImageGUI extends JFrame {
     }
 
     public void init_UniformButton() {
-        JButton uniformButton = new JButton("Uniform");
+        uniformButton = new JButton("Uniform");
         uniformButton.addActionListener(e -> uniform());
         controlPanel.add(uniformButton);
     }
 
     public void init_ColorPaletteButton() {
-        JButton colorPaletteButton = new JButton("show color palette");
+        colorPaletteButton = new JButton("show color palette");
         colorPaletteButton.addActionListener(e -> showColorPalette());
         controlPanel.add(colorPaletteButton);
     }
 
     public void init_ColorHistogramButton() {
-        JButton colorHistogramButton = new JButton("show color histogram");
+        colorHistogramButton = new JButton("show color histogram");
         colorHistogramButton.addActionListener(e -> showColorHistogram());
         controlPanel.add(colorHistogramButton);
     }
 
     public void init_CompareButton() {
-        JButton compareButton = new JButton("compare algorithms");
+        compareButton = new JButton("compare algorithms");
         compareButton.addActionListener(e -> compareAlgorithms());
-        //controlPanel.add(compareButton);
+        controlPanel.add(compareButton);
     }
 
     public void init_CompareButton2() {
-        JButton compareButton2 = new JButton("compare algorithms 2");
+        compareButton2 = new JButton("compare algorithms 2");
         compareButton2.addActionListener(e -> compareAlgorithms2());
         controlPanel.add(compareButton2);
     }
 
     public void init_loadImageButton() {
-        JButton loadImageButton = new JButton("load image");
+        loadImageButton = new JButton("load image");
         loadImageButton.addActionListener(e -> loadImage());
         controlPanel.add(loadImageButton);
     }
@@ -119,13 +122,13 @@ public class ImageGUI extends JFrame {
     }
 
     public void init_saveImageButton() {
-        JButton saveImageButton = new JButton("save image");
+        saveImageButton = new JButton("save image");
         saveImageButton.addActionListener(e -> saveImage());
         controlPanel.add(saveImageButton);
     }
 
     public void init_saveIndexedImageButton() {
-        JButton saveIndexedImageButton = new JButton("save as indexed image");
+        saveIndexedImageButton = new JButton("save as indexed image");
         saveIndexedImageButton.addActionListener(e -> saveIndexedImage());
         controlPanel.add(saveIndexedImageButton);
     }
@@ -135,9 +138,9 @@ public class ImageGUI extends JFrame {
     }
 
     public void init_KmeansButton() {
-        JButton kmeansButton = new JButton("K_Means");
-        kmeansButton.addActionListener(e -> kMean());
-        controlPanel.add(kmeansButton);
+        KmeansButton = new JButton("K_Means");
+        KmeansButton.addActionListener(e -> kMean());
+        controlPanel.add(KmeansButton);
     }
 
     public void init_MedianButton() {
@@ -222,7 +225,7 @@ public class ImageGUI extends JFrame {
                                System.out.println(file.getName());
                                System.out.println("--------------------------");
                             try {
-                                ImageIO.write(currentImage, "png", new File(image_route.output1 + file.getName()));
+                                ImageIO.write(currentImage, formatName, new File(image_route.output1 + file.getName()));
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -249,7 +252,7 @@ public class ImageGUI extends JFrame {
         if (result == JFileChooser.APPROVE_OPTION) {
             try {
                 File file = fileChooser.getSelectedFile();
-                ImageIO.write(currentImage, "png", file);
+                ImageIO.write(currentImage, formatName, file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -262,7 +265,7 @@ public class ImageGUI extends JFrame {
             try {
                 File file = fileChooser.getSelectedFile();
                 indexed_image indexed = new indexed_image(currentImage);
-                ImageIO.write(indexed.constructed_image, "png", file);
+                ImageIO.write(indexed.constructed_image, formatName, file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -271,14 +274,14 @@ public class ImageGUI extends JFrame {
 
     private void restoreOriginal() {
 
-        fileChooser.setSelectedFile(new File("original.png"));
+        fileChooser.setSelectedFile(new File("original."+formatName));
         currentImage = image;
         imageLabel.setIcon(new ImageIcon(image));
 
     }
 
     private void uniform() {
-        fileChooser.setSelectedFile(new File("uniform.png"));
+        fileChooser.setSelectedFile(new File("uniform."+formatName));
         long startTime = System.nanoTime();
         BufferedImage quantizedImage = UniformQuantization.quantize(image, (int) uniformSpinnerModel.getValue());
         long endTime = System.nanoTime();
@@ -290,7 +293,7 @@ public class ImageGUI extends JFrame {
     }
 
     private void kMean() {
-        fileChooser.setSelectedFile(new File("kMean.png"));
+        fileChooser.setSelectedFile(new File("kMean."+formatName));
         long startTime = System.nanoTime();
         BufferedImage quantizedImage = KMeansQuantizer.quantize(image, (int) kMeansSpinnerModel.getValue());
         long endTime = System.nanoTime();
@@ -303,7 +306,7 @@ public class ImageGUI extends JFrame {
 
     private void median_cut() {
 
-        fileChooser.setSelectedFile(new File("median_cut.png"));
+        fileChooser.setSelectedFile(new File("median_cut."+formatName));
         long startTime = System.nanoTime();
 
         int height = image.getHeight();
@@ -334,7 +337,7 @@ public class ImageGUI extends JFrame {
     private Integer getImageSize(BufferedImage quantizedImage) {
         ByteArrayOutputStream tmp = new ByteArrayOutputStream();
         try {
-            ImageIO.write(quantizedImage, "png", tmp);
+            ImageIO.write(quantizedImage, formatName, tmp);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
