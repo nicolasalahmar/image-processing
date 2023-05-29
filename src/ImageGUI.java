@@ -1,5 +1,6 @@
 import color_quantization_algorithms.KMeansQuantizer;
 import color_quantization_algorithms.MedianCutColorQuantization;
+import color_quantization_algorithms.NearestColorAlgorithm;
 import color_quantization_algorithms.UniformQuantization;
 
 import javax.imageio.ImageIO;
@@ -9,15 +10,16 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class ImageGUI extends JFrame {
-    private final String formatName="bmp";
+    private final String formatName="png";
     private final JLabel imageLabel;
     private JButton MedianCutButton;
     private JButton restoreOriginal;
-    int originalImageSize, kMeanImageSize, uniformImageSize, medianCutImageSize;
+    int originalImageSize, kMeanImageSize, uniformImageSize, medianCutImageSize,nearestColorImageSize;
     JFileChooser fileChooser = new JFileChooser(image_route.image_route);
 
     BufferedImage currentImage;
@@ -33,7 +35,7 @@ public class ImageGUI extends JFrame {
     JPanel colorPalettePanel = new JPanel(new GridLayout(0, 5));
     JFrame colorPaletteFrame = new JFrame("Color Palette");
     JFrame colorHistogramFrame = new JFrame("Color Histogram");
-    long kMeanImageTime = 0, uniformImageTime = 0, medianCutImageTime = 0;
+    long kMeanImageTime = 0, uniformImageTime = 0, medianCutImageTime = 0 ,nearestColorTime=0;
 
 
     public ImageGUI() {
@@ -60,18 +62,20 @@ public class ImageGUI extends JFrame {
         init_UniformSpinner();
         init_KmeansButton();
         init_KmeansSpinner();
-        init_MedianButton();init_MedianSpinner();
+        init_NearestColor();
+
+       // init_MedianSpinner();
 
         init_loadImageButton();
-        init_findSimilarImagesButton();
+        //init_findSimilarImagesButton();
         init_saveImageButton();
         init_saveIndexedImageButton();
         init_CompareButton();
-        init_CompareButton2();
         init_ColorPaletteButton();
         init_ColorHistogramButton();
         init_restoreOriginalImageButton();
         init_searchByColor();
+        init_MedianButton();
         // Add the components to the frame
         add(imageLabel, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
@@ -82,6 +86,11 @@ public class ImageGUI extends JFrame {
         JButton uniformButton = new JButton("Uniform");
         uniformButton.addActionListener(e -> uniform());
         controlPanel.add(uniformButton);
+    }
+    public void init_NearestColor() {
+        JButton nearestColorButton = new JButton("Nearest Color");
+        nearestColorButton.addActionListener(e -> nearestColor());
+        controlPanel.add(nearestColorButton);
     }
 
     public void init_ColorPaletteButton() {
@@ -96,15 +105,11 @@ public class ImageGUI extends JFrame {
         controlPanel.add(colorHistogramButton);
     }
 
-    public void init_CompareButton() {
-        JButton compareButton = new JButton("compare algorithms");
-        compareButton.addActionListener(e -> compareAlgorithms());
-        controlPanel.add(compareButton);
-    }
 
-    public void init_CompareButton2() {
+
+    public void init_CompareButton() {
         JButton compareButton2 = new JButton("compare algorithms 2");
-        compareButton2.addActionListener(e -> compareAlgorithms2());
+        compareButton2.addActionListener(e -> compareAlgorithms());
         controlPanel.add(compareButton2);
     }
 
@@ -291,6 +296,20 @@ public class ImageGUI extends JFrame {
         uniformImageSize = getImageSize(quantizedImage);
 
     }
+    private void nearestColor() {
+        ColorPalette colorPalette = new ColorPalette();
+        List<Color> palette = colorPalette.createColorPalette(currentImage, 15);
+        fileChooser.setSelectedFile(new File("nearest_color."+formatName));
+        long startTime = System.nanoTime();
+        NearestColorAlgorithm algorithm = new NearestColorAlgorithm(palette);
+        BufferedImage nearestColorImage = algorithm.quantize(image);
+        long endTime = System.nanoTime();
+        nearestColorTime = endTime - startTime;
+        currentImage = nearestColorImage;
+        imageLabel.setIcon(new ImageIcon(nearestColorImage));
+        nearestColorImageSize = getImageSize(nearestColorImage);
+
+    }
 
     private void kMean() {
         fileChooser.setSelectedFile(new File("kMean."+formatName));
@@ -349,46 +368,11 @@ public class ImageGUI extends JFrame {
         return tmp.size() / 1024;
 
     }
-
     private void compareAlgorithms() {
         kMean();
         uniform();
-        restoreOriginal();
-        int sizeDifference = Math.abs(kMeanImageSize - uniformImageSize);
-        double timeDifference = Math.abs(kMeanImageTime - uniformImageTime);
-        timeDifference = (timeDifference / 1000000000);
-
-        String theBetterAlgorithmInSize = "K Means", theWorseAlgorithmInSize = "Uniform";
-        if (kMeanImageSize > uniformImageSize) {
-            theBetterAlgorithmInSize = "Uniform";
-            theWorseAlgorithmInSize = "K Means";
-        }
-
-        String theBetterAlgorithmInTime = "K Means", theWorseAlgorithmInTime = "Uniform";
-        if (kMeanImageTime > uniformImageTime) {
-            theBetterAlgorithmInTime = "Uniform";
-            theWorseAlgorithmInTime = "K Means";
-        }
-
-        double kmeantime = ((double) kMeanImageTime / 1000000000);
-        double uniformtime = ((double) uniformImageTime / 1000000000);
-        JOptionPane.showMessageDialog
-                (null, "the size of the original image is" +
-                        " " + originalImageSize + " kb" + "\n" + "the size of quantized image that use K_Means algorithm is"
-                        + " " + kMeanImageSize + " kb" + "\n" + "the size of quantized image that use Uniform algorithm is"
-                        + " " + uniformImageSize + " kb" + "\n"
-                        + " " + "the time taken to execute K_Means algorithm is"
-                        + " " + (double) Math.round(kmeantime * 100) / 100 + " s" + "\n" + "the time taken to execute Uniform algorithm is"
-                        + " " + (double) Math.round(uniformtime * 100) / 100 + " s" + "\n\n"
-                        + theBetterAlgorithmInSize + " is  better than " + theWorseAlgorithmInSize + " in size by " + sizeDifference + " kb\n"
-                        + theBetterAlgorithmInTime + " is  better than " + theWorseAlgorithmInTime + " in time by " + (double) Math.round(timeDifference * 100) / 100 + " s");
-
-    }
-
-    private void compareAlgorithms2() {
-        kMean();
-        uniform();
-        median_cut();
+        //median_cut();
+        nearestColor();
         restoreOriginal();
 
         int sizeDifferenceKMeanUniform = Math.abs(kMeanImageSize - uniformImageSize);
@@ -402,25 +386,25 @@ public class ImageGUI extends JFrame {
         String bestAlgorithmInSize = "";
         String bestAlgorithmInTime = "";
 
-        if (kMeanImageSize <= uniformImageSize && kMeanImageSize <= medianCutImageSize) {
+        if (kMeanImageSize <= uniformImageSize && kMeanImageSize <= nearestColorImageSize) {
             bestAlgorithmInSize = "K Means";
-        } else if (uniformImageSize <= kMeanImageSize && uniformImageSize <= medianCutImageSize) {
+        } else if (uniformImageSize <= kMeanImageSize && uniformImageSize <= nearestColorImageSize) {
             bestAlgorithmInSize = "Uniform";
-        } else if (medianCutImageSize <= kMeanImageSize && medianCutImageSize <= uniformImageSize) {
-            bestAlgorithmInSize = "Median Cut";
+        } else {
+            bestAlgorithmInSize = "Nearest Color";
         }
 
-        if (kMeanImageTime <= uniformImageTime && kMeanImageTime <= medianCutImageTime) {
+        if (kMeanImageTime <= uniformImageTime && kMeanImageTime <= nearestColorTime) {
             bestAlgorithmInTime = "K Means";
-        } else if (uniformImageTime <= kMeanImageTime && uniformImageTime <= medianCutImageTime) {
+        } else if (uniformImageTime <= kMeanImageTime && uniformImageTime <= nearestColorTime) {
             bestAlgorithmInTime = "Uniform";
-        } else if (medianCutImageTime <= kMeanImageTime && medianCutImageTime <= uniformImageTime) {
-            bestAlgorithmInTime = "Median Cut";
+        } else {
+            bestAlgorithmInTime = "Nearest Color";
         }
 
         double kMeanTimeInSeconds = (double) kMeanImageTime / 1000000000.0;
         double uniformTimeInSeconds = (double) uniformImageTime / 1000000000.0;
-        double medianCutTimeInSeconds = (double) medianCutImageTime / 1000000000.0;
+        double nearestColorTimeInSeconds = (double) nearestColorTime / 1000000000.0;
 
         String message = "Comparison Results:\n\n";
         message += "Original Image Size: " + originalImageSize + " kb\n\n";
@@ -430,9 +414,9 @@ public class ImageGUI extends JFrame {
         message += "Uniform Algorithm:\n";
         message += "- Quantized Image Size: " + uniformImageSize + " kb\n";
         message += "- Execution Time: " + uniformTimeInSeconds + " s\n\n";
-        message += "Median Cut Algorithm:\n";
-        message += "- Quantized Image Size: " + medianCutImageSize + " kb\n";
-        message += "- Execution Time: " + medianCutTimeInSeconds + " s\n\n";
+        message += "Nearest Color Algorithm:\n";
+        message += "- Quantized Image Size: " + nearestColorImageSize + " kb\n";
+        message += "- Execution Time: " + nearestColorTimeInSeconds + " s\n\n";
         message += "Size Comparison:\n";
         message += "- The best algorithm in terms of size is: " + bestAlgorithmInSize + "\n\n";
         message += "Execution Time Comparison:\n";
