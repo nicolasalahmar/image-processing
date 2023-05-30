@@ -457,7 +457,7 @@ public class ImageGUI extends JFrame {
         colorHistogramFrame.getContentPane().removeAll();
 
         ColorPalette colorPalette = new ColorPalette();
-
+        //Choose most 10 colors to appear in the color histogram
         List<Color> palette = colorPalette.createColorPalette(currentImage, 10);
 
         // Create a new color histogram panel.
