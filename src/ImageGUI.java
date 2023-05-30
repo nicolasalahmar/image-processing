@@ -10,9 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class ImageGUI extends JFrame {
     private final String formatName="png";
@@ -25,12 +23,12 @@ public class ImageGUI extends JFrame {
     BufferedImage currentImage;
     JLabel kMeanLabel = new JLabel("clusters number");
     JLabel uniformLabel = new JLabel("colors number");
-    JLabel medianLabel = new JLabel("median number");
+    JLabel nearestLabel = new JLabel("nearest color");
 
     JLabel colorPaletteLabel = new JLabel("colors palette number");
     private BufferedImage image;
-    SpinnerModel kMeansSpinnerModel, uniformSpinnerModel, MedianCutSpinnerModel;
-    JSpinner kMeansSpinner, uniformSpinner, medianSpinner;
+    SpinnerModel kMeansSpinnerModel, uniformSpinnerModel, nearestColorSpinnerModel;
+    JSpinner kMeansSpinner, uniformSpinner, nearestSpinner;
     JPanel controlPanel;
     JPanel colorPalettePanel = new JPanel(new GridLayout(0, 5));
     JFrame colorPaletteFrame = new JFrame("Color Palette");
@@ -63,8 +61,7 @@ public class ImageGUI extends JFrame {
         init_KmeansButton();
         init_KmeansSpinner();
         init_NearestColor();
-
-       // init_MedianSpinner();
+        init_NearestSpinner();
 
         init_loadImageButton();
         //init_findSimilarImagesButton();
@@ -104,27 +101,23 @@ public class ImageGUI extends JFrame {
         colorHistogramButton.addActionListener(e -> showColorHistogram());
         controlPanel.add(colorHistogramButton);
     }
-
-
-
     public void init_CompareButton() {
         JButton compareButton2 = new JButton("compare algorithms 2");
         compareButton2.addActionListener(e -> compareAlgorithms());
         controlPanel.add(compareButton2);
     }
-
     public void init_loadImageButton() {
         JButton loadImageButton = new JButton("load image");
         loadImageButton.addActionListener(e -> loadImage());
         controlPanel.add(loadImageButton);
     }
 
-    public void init_findSimilarImagesButton() {
-        JButton findSimilarImagesButton;
-        findSimilarImagesButton = new JButton("find similar images");
-        findSimilarImagesButton.addActionListener(e -> findSimilarImages());
-        controlPanel.add(findSimilarImagesButton);
-    }
+//    public void init_findSimilarImagesButton() {
+//        JButton findSimilarImagesButton;
+//        findSimilarImagesButton = new JButton("find similar images");
+//        findSimilarImagesButton.addActionListener(e -> findSimilarImages());
+//        controlPanel.add(findSimilarImagesButton);
+//    }
 
     public void init_saveImageButton() {
         JButton saveImageButton = new JButton("save image");
@@ -175,13 +168,11 @@ public class ImageGUI extends JFrame {
         controlPanel.add(uniformLabel);
         controlPanel.add(uniformSpinner);
     }
-
-    public void init_MedianSpinner() {
-
-        MedianCutSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
-        medianSpinner = new JSpinner(MedianCutSpinnerModel);
-        controlPanel.add(medianLabel);
-        controlPanel.add(medianSpinner);
+    public void init_NearestSpinner() {
+        nearestColorSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
+        nearestSpinner = new JSpinner(nearestColorSpinnerModel);
+        controlPanel.add(nearestLabel);
+        controlPanel.add(nearestSpinner);
     }
 
     public void init_searchByColor() {
@@ -213,35 +204,35 @@ public class ImageGUI extends JFrame {
         return PaletteVector.toLabVector(palette);
     }
 
-    public void findSimilarImages() {
-        int result = fileChooser.showOpenDialog(this);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            try {
-                double[] lab_paletteVector1 = image_to_vector(fileChooser.getSelectedFile());
-                imageLabel.setIcon(new ImageIcon(image));
-                File folder = new File(image_route.indexed_image_route);
-                for (File file : Objects.requireNonNull(folder.listFiles())) {
-                    if (file.isFile()) {
-                        double[] lab_paletteVector2 = image_to_vector(file);
-                       // System.out.printf(file.getName() + ":  %.2f\n", PaletteVector.computeCosineSimilarity(lab_paletteVector1, lab_paletteVector2));
-                       // System.out.printf(file.getName() + ":  %.2f\n", PaletteVector.euclideanDistance(lab_paletteVector1, lab_paletteVector2));
-
-                        if (PaletteVector.computeCosineSimilarity(lab_paletteVector1, lab_paletteVector2) >0.75) {
-                               System.out.println(file.getName());
-                               System.out.println("--------------------------");
-                            try {
-                                ImageIO.write(currentImage, formatName, new File(image_route.output1 ,file.getName()));
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    public void findSimilarImages() {
+//        int result = fileChooser.showOpenDialog(this);
+//        if (result == JFileChooser.APPROVE_OPTION) {
+//            try {
+//                double[] lab_paletteVector1 = image_to_vector(fileChooser.getSelectedFile());
+//                imageLabel.setIcon(new ImageIcon(image));
+//                File folder = new File(image_route.indexed_image_route);
+//                for (File file : Objects.requireNonNull(folder.listFiles())) {
+//                    if (file.isFile()) {
+//                        double[] lab_paletteVector2 = image_to_vector(file);
+//                       // System.out.printf(file.getName() + ":  %.2f\n", PaletteVector.computeCosineSimilarity(lab_paletteVector1, lab_paletteVector2));
+//                       // System.out.printf(file.getName() + ":  %.2f\n", PaletteVector.euclideanDistance(lab_paletteVector1, lab_paletteVector2));
+//
+//                        if (PaletteVector.computeCosineSimilarity(lab_paletteVector1, lab_paletteVector2) >0.75) {
+//                               System.out.println(file.getName());
+//                               System.out.println("--------------------------");
+//                            try {
+//                                ImageIO.write(currentImage, formatName, new File(image_route.output1 ,file.getName()));
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                    }
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
 
     public void searchByColor() {
@@ -263,7 +254,6 @@ public class ImageGUI extends JFrame {
             }
         }
     }
-
     public void saveIndexedImage() {
         int result = fileChooser.showSaveDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
@@ -276,7 +266,6 @@ public class ImageGUI extends JFrame {
             }
         }
     }
-
     private void restoreOriginal() {
 
         fileChooser.setSelectedFile(new File("original."+formatName));
@@ -298,7 +287,7 @@ public class ImageGUI extends JFrame {
     }
     private void nearestColor() {
         ColorPalette colorPalette = new ColorPalette();
-        List<Color> palette = colorPalette.createColorPalette(currentImage, 15);
+        List<Color> palette = colorPalette.createColorPalette(image,  (int) nearestColorSpinnerModel.getValue());
         fileChooser.setSelectedFile(new File("nearest_color."+formatName));
         long startTime = System.nanoTime();
         NearestColorAlgorithm algorithm = new NearestColorAlgorithm(palette);
@@ -344,7 +333,7 @@ public class ImageGUI extends JFrame {
             }
         }
 
-        BufferedImage quantizedImage = MedianCutColorQuantization.splitIntoBuckets(image, flattenedImgArray,(int) medianSpinner.getValue());
+        BufferedImage quantizedImage = MedianCutColorQuantization.splitIntoBuckets(image, flattenedImgArray,2);
 
         long endTime = System.nanoTime();
         medianCutImageTime = endTime - startTime;
@@ -371,7 +360,6 @@ public class ImageGUI extends JFrame {
     private void compareAlgorithms() {
         kMean();
         uniform();
-        //median_cut();
         nearestColor();
         restoreOriginal();
 
