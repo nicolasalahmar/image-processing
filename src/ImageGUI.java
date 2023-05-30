@@ -102,9 +102,9 @@ public class ImageGUI extends JFrame {
         controlPanel.add(colorHistogramButton);
     }
     public void init_CompareButton() {
-        JButton compareButton2 = new JButton("compare algorithms 2");
-        compareButton2.addActionListener(e -> compareAlgorithms());
-        controlPanel.add(compareButton2);
+        JButton compareButton = new JButton("compare algorithms");
+        compareButton.addActionListener(e -> compareAlgorithms());
+        controlPanel.add(compareButton);
     }
     public void init_loadImageButton() {
         JButton loadImageButton = new JButton("load image");
