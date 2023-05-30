@@ -2,7 +2,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import javax.swing.JPanel;
-
 public class ColorHistogram extends JPanel {
 
     private int[] colorFreq;
