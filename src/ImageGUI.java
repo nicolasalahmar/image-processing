@@ -112,12 +112,12 @@ public class ImageGUI extends JFrame {
         controlPanel.add(loadImageButton);
     }
 
-    public void init_findSimilarImagesButton() {
-        JButton findSimilarImagesButton;
-        findSimilarImagesButton = new JButton("find similar images");
-        findSimilarImagesButton.addActionListener(e -> findSimilarImages());
-        controlPanel.add(findSimilarImagesButton);
-    }
+//    public void init_findSimilarImagesButton() {
+//        JButton findSimilarImagesButton;
+//        findSimilarImagesButton = new JButton("find similar images");
+//        findSimilarImagesButton.addActionListener(e -> findSimilarImages());
+//        controlPanel.add(findSimilarImagesButton);
+//    }
 
     public void init_saveImageButton() {
         JButton saveImageButton = new JButton("save image");
@@ -204,35 +204,35 @@ public class ImageGUI extends JFrame {
         return PaletteVector.toLabVector(palette);
     }
 
-    public void findSimilarImages() {
-        int result = fileChooser.showOpenDialog(this);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            try {
-                double[] lab_paletteVector1 = image_to_vector(fileChooser.getSelectedFile());
-                imageLabel.setIcon(new ImageIcon(image));
-                File folder = new File(image_route.indexed_image_route);
-                for (File file : Objects.requireNonNull(folder.listFiles())) {
-                    if (file.isFile()) {
-                        double[] lab_paletteVector2 = image_to_vector(file);
-                       // System.out.printf(file.getName() + ":  %.2f\n", PaletteVector.computeCosineSimilarity(lab_paletteVector1, lab_paletteVector2));
-                       // System.out.printf(file.getName() + ":  %.2f\n", PaletteVector.euclideanDistance(lab_paletteVector1, lab_paletteVector2));
-
-                        if (PaletteVector.computeCosineSimilarity(lab_paletteVector1, lab_paletteVector2) >0.75) {
-                               System.out.println(file.getName());
-                               System.out.println("--------------------------");
-                            try {
-                                ImageIO.write(currentImage, formatName, new File(image_route.output1 ,file.getName()));
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    public void findSimilarImages() {
+//        int result = fileChooser.showOpenDialog(this);
+//        if (result == JFileChooser.APPROVE_OPTION) {
+//            try {
+//                double[] lab_paletteVector1 = image_to_vector(fileChooser.getSelectedFile());
+//                imageLabel.setIcon(new ImageIcon(image));
+//                File folder = new File(image_route.indexed_image_route);
+//                for (File file : Objects.requireNonNull(folder.listFiles())) {
+//                    if (file.isFile()) {
+//                        double[] lab_paletteVector2 = image_to_vector(file);
+//                       // System.out.printf(file.getName() + ":  %.2f\n", PaletteVector.computeCosineSimilarity(lab_paletteVector1, lab_paletteVector2));
+//                       // System.out.printf(file.getName() + ":  %.2f\n", PaletteVector.euclideanDistance(lab_paletteVector1, lab_paletteVector2));
+//
+//                        if (PaletteVector.computeCosineSimilarity(lab_paletteVector1, lab_paletteVector2) >0.75) {
+//                               System.out.println(file.getName());
+//                               System.out.println("--------------------------");
+//                            try {
+//                                ImageIO.write(currentImage, formatName, new File(image_route.output1 ,file.getName()));
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                    }
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
 
     public void searchByColor() {

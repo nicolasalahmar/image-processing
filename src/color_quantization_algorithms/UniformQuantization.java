@@ -7,9 +7,12 @@ public class UniformQuantization {
     public static BufferedImage quantize(BufferedImage image, int numColors) {
         // Calculate the color quantization level
         //Math.ceil() round up the logarithm of the number of colors to the nearest integer
+        //This determines the number of bits that will be used to represent each color channel
         int levels = (int) Math.ceil(Math.log(numColors) / Math.log(2));
 
         // Calculate the color quantization interval
+        //This determines the size of the intervals used to divide the color space
+        //A smaller quantization interval will result in a larger number of discrete colors
         int interval = 256 / (int) Math.pow(2, levels);
 
         // Create the output image
