@@ -1,7 +1,7 @@
 import java.awt.*;
 import java.util.List;
 
-public class PaletteVector {
+public class PicturesSimilarity {
 
 
     public static double[] toLabVector(List<Color> colorPalette) {
@@ -53,7 +53,7 @@ public class PaletteVector {
     }
 
 
-    public static double computeCosineSimilarity(double[] v1, double[] v2) {
+    public static double cosineSimilarity(double[] v1, double[] v2) {
 
         //This method takes in two palette vectors and returns their cosine similarity score.
 
@@ -65,6 +65,8 @@ public class PaletteVector {
             norm1 += Math.pow(v1[i], 2);
             norm2 += Math.pow(v2[i], 2);
         }
+        // dividing the dot product of the two vectors by the product of their Euclidean normals.
+
         return dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
     }
 
@@ -81,4 +83,6 @@ public class PaletteVector {
         normalized = (1 / (1 + euclidean_distance)) * 100;
         return normalized;
     }
+
+
 }
