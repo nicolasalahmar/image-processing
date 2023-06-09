@@ -3,6 +3,9 @@ import color_quantization_algorithms.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -24,13 +27,21 @@ public class ImageGUI extends JFrame {
     JFileChooser fileChooser = new JFileChooser(image_route.image_route);
 
     BufferedImage currentImage;
+
+    private BufferedImage originalImage;
+
+    private Rectangle2D cropBounds;
+    private boolean isCropSelected;
+
+    private JButton cropButton;
+    private JButton resizeButton;
+
     JLabel kMeanLabel = new JLabel("clusters number");
     JLabel uniformLabel = new JLabel("colors number");
     JLabel nearestLabel = new JLabel("nearest color");
     JLabel medianCutLabel = new JLabel("boxes number");
 
     JLabel colorPaletteLabel = new JLabel("colors palette number");
-    private BufferedImage image;
     SpinnerModel medianCutSpinnerModel,kMeansSpinnerModel, uniformSpinnerModel, nearestColorSpinnerModel;
     JSpinner medianCutSpinner,kMeansSpinner, uniformSpinner, nearestSpinner;
     JPanel controlPanel;
@@ -38,7 +49,6 @@ public class ImageGUI extends JFrame {
     JFrame colorPaletteFrame = new JFrame("Color Palette");
     JFrame colorHistogramFrame = new JFrame("Color Histogram");
     long kMeanImageTime = 0, uniformImageTime = 0, medianCutImageTime = 0, nearestColorTime = 0;
-
 
     public ImageGUI() {
 
@@ -49,7 +59,24 @@ public class ImageGUI extends JFrame {
         setTitle("Image GUI");
 
         // Create the components
-        imageLabel = new JLabel();
+        imageLabel = new JLabel(){
+            @Override
+            protected void paintComponent(Graphics g) {
+
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                // Draw the crop box overlay
+                if (isCropSelected) {
+                    g2d.setColor(Color.PINK);
+                    g2d.setStroke(new BasicStroke(2));
+                    g2d.draw(cropBounds);
+                    g2d.setColor(new Color(255, 255, 255, 128));
+                    g2d.fill(cropBounds);
+                }
+            }
+
+        };
+
         imageLabel.setHorizontalAlignment(JLabel.CENTER);
         imageLabel.setVerticalAlignment(JLabel.CENTER);
 
@@ -67,8 +94,10 @@ public class ImageGUI extends JFrame {
         init_NearestColor();
         init_NearestSpinner();
         init_MedianButton();
-        Init_median_cut_Spinner();
-        
+        median_cut_Spinner();
+        ImageCropper();
+
+
         init_loadImageButton();
         init_findSimilarImagesButton();
         init_saveImageButton();
@@ -186,7 +215,7 @@ public class ImageGUI extends JFrame {
         controlPanel.add(nearestSpinner);
     }
 
-    public void Init_median_cut_Spinner() {
+    public void median_cut_Spinner() {
         medianCutSpinnerModel = new SpinnerNumberModel(10, 2, 1024, 2);
         medianCutSpinner = new JSpinner(medianCutSpinnerModel);
         controlPanel.add(medianCutLabel);
@@ -205,10 +234,15 @@ public class ImageGUI extends JFrame {
         int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             try {
-                image = ImageIO.read(fileChooser.getSelectedFile());
-                imageLabel.setIcon(new ImageIcon(image));
-                originalImageSize = getImageSize(image);
-                currentImage = image;
+                originalImage = ImageIO.read(fileChooser.getSelectedFile());
+                imageLabel.setPreferredSize(new Dimension(originalImage.getWidth(), originalImage.getHeight()));
+                imageLabel.setIcon(new ImageIcon(originalImage));
+
+                resizeButton.setEnabled(true);
+
+                originalImageSize = getImageSize(originalImage);
+                currentImage = originalImage;
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -216,9 +250,9 @@ public class ImageGUI extends JFrame {
     }
 
     public List<Color> image_to_palette(File file,int colorPaletteSize) throws IOException {
-        image = ImageIO.read(file);
-        originalImageSize = getImageSize(image);
-        currentImage = image;
+        originalImage = ImageIO.read(file);
+        originalImageSize = getImageSize(originalImage);
+        currentImage = originalImage;
         ColorPalette colorPalette = new ColorPalette();
         return colorPalette.createColorPalette(currentImage, colorPaletteSize);
     }
@@ -229,7 +263,7 @@ public class ImageGUI extends JFrame {
         double[] lab_paletteVector1;
         try {
             lab_paletteVector1 = PicturesSimilarity.toLabVector(image_to_palette(fileChooser.getSelectedFile(),10));
-            imageLabel.setIcon(new ImageIcon(image));
+            imageLabel.setIcon(new ImageIcon(originalImage));
             File folder = new File(image_route.indexed_image_route);
             for (File file : Objects.requireNonNull(folder.listFiles())) {
                 if (file.isFile() && !file.getName().equals(".gitkeep")) {
@@ -280,15 +314,15 @@ public class ImageGUI extends JFrame {
     private void restoreOriginal() {
 
         fileChooser.setSelectedFile(new File("original." + formatName));
-        currentImage = image;
-        imageLabel.setIcon(new ImageIcon(image));
+        currentImage = originalImage;
+        imageLabel.setIcon(new ImageIcon(originalImage));
 
     }
 
     private void uniform() {
         fileChooser.setSelectedFile(new File("uniform." + formatName));
         long startTime = System.nanoTime();
-        BufferedImage quantizedImage = UniformQuantization.quantize(image, (int) uniformSpinnerModel.getValue());
+        BufferedImage quantizedImage = UniformQuantization.quantize(originalImage, (int) uniformSpinnerModel.getValue());
         long endTime = System.nanoTime();
         uniformImageTime = endTime - startTime;
         currentImage = quantizedImage;
@@ -299,11 +333,11 @@ public class ImageGUI extends JFrame {
 
     private void nearestColor() {
         ColorPalette colorPalette = new ColorPalette();
-        List<Color> palette = colorPalette.createColorPalette(image, (int) nearestColorSpinnerModel.getValue());
+        List<Color> palette = colorPalette.createColorPalette(originalImage, (int) nearestColorSpinnerModel.getValue());
         fileChooser.setSelectedFile(new File("nearest_color." + formatName));
         long startTime = System.nanoTime();
         NearestColorAlgorithm algorithm = new NearestColorAlgorithm(palette);
-        BufferedImage nearestColorImage = algorithm.quantize(image);
+        BufferedImage nearestColorImage = algorithm.quantize(originalImage);
         long endTime = System.nanoTime();
         nearestColorTime = endTime - startTime;
         currentImage = nearestColorImage;
@@ -315,7 +349,7 @@ public class ImageGUI extends JFrame {
     private void kMean() {
         fileChooser.setSelectedFile(new File("kMean." + formatName));
         long startTime = System.nanoTime();
-        BufferedImage quantizedImage = KMeansQuantizer.quantize(image, (int) kMeansSpinnerModel.getValue());
+        BufferedImage quantizedImage = KMeansQuantizer.quantize(originalImage, (int) kMeansSpinnerModel.getValue());
         long endTime = System.nanoTime();
         kMeanImageTime = endTime - startTime;
         currentImage = quantizedImage;
@@ -328,7 +362,7 @@ public class ImageGUI extends JFrame {
         fileChooser.setSelectedFile(new File("median_cut."+formatName));
         long startTime = System.nanoTime();
 
-        BufferedImage quantizedImage = MediaCutNew.quantizeImage(image,(int) medianCutSpinnerModel.getValue());
+        BufferedImage quantizedImage = MediaCutNew.quantizeImage(originalImage,(int) medianCutSpinnerModel.getValue());
 
         long endTime = System.nanoTime();
         medianCutImageTime = endTime - startTime;
@@ -344,14 +378,14 @@ public class ImageGUI extends JFrame {
         fileChooser.setSelectedFile(new File("median_cut." + formatName));
         long startTime = System.nanoTime();
 
-        int height = image.getHeight();
-        int width = image.getWidth();
+        int height = originalImage.getHeight();
+        int width = originalImage.getWidth();
         int[][] flattenedImgArray = new int[height * width][5];
 
         int index = 0;
         for (int rIndex = 0; rIndex < height; rIndex++) {
             for (int cIndex = 0; cIndex < width; cIndex++) {
-                int rgb = image.getRGB(cIndex, rIndex);
+                int rgb = originalImage.getRGB(cIndex, rIndex);
                 int r = (rgb >> 16) & 0xFF;
                 int g = (rgb >> 8) & 0xFF;
                 int b = rgb & 0xFF;
@@ -360,7 +394,7 @@ public class ImageGUI extends JFrame {
             }
         }
 
-        BufferedImage quantizedImage = MedianCutColorQuantization.splitIntoBuckets(image, flattenedImgArray, 2);
+        BufferedImage quantizedImage = MedianCutColorQuantization.splitIntoBuckets(originalImage, flattenedImgArray, 2);
 
         long endTime = System.nanoTime();
         medianCutImageTime = endTime - startTime;
@@ -515,5 +549,141 @@ public class ImageGUI extends JFrame {
 
         colorHistogramFrame.setVisible(true);
     }
+
+
+    /////////////////////// image cropper start here ////////////////////////////
+
+    /////////////////////////////
+
+    /////////////////////// image cropper start here ////////////////////////////
+
+    public void ImageCropper() {
+
+
+        // Create components
+        cropButton = new JButton("Crop");
+        resizeButton = new JButton("Resize");
+        cropButton.setEnabled(false);
+        resizeButton.setEnabled(true);
+
+        // Add components to the frame
+        controlPanel.add(cropButton);
+        controlPanel.add(resizeButton);
+        add(controlPanel, BorderLayout.SOUTH);
+
+
+        // Add mouse listener to the image panel
+        imageLabel.addMouseListener(new CustomMouseListener());
+
+        // Add action listener to the crop button
+        cropButton.addActionListener(e -> cropImage());
+
+        // Add action listener to the resize button
+        resizeButton.addActionListener(e -> resizeImage());
+
+        // Set the frame size based on the image size
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+
+    private void cropImage() {
+        int x = (int) cropBounds.getX();
+        int y = (int) cropBounds.getY() ;
+        int width = (int) cropBounds.getWidth();
+        int height = (int) cropBounds.getHeight();
+        currentImage = currentImage.getSubimage(x, y, width, height);
+
+        //Update the original image in the image panel
+        imageLabel.setIcon(new ImageIcon(currentImage));
+
+        // Reset the crop selection
+        isCropSelected = false;
+        cropButton.setEnabled(false);
+        cropBounds = null;
+        imageLabel.repaint();
+
+        // Display cropped image in a new frame
+//        JFrame croppedFrame = new JFrame("Cropped Image");
+//        JLabel croppedLabel = new JLabel(new ImageIcon(currentImage));
+//        croppedFrame.getContentPane().add(croppedLabel);
+//        croppedFrame.pack();
+//        croppedFrame.setLocationRelativeTo(null);
+//        croppedFrame.setVisible(true);
+
+    }
+
+    private void resizeImage() {
+        // Prompt for new width and height
+        String widthString = JOptionPane.showInputDialog("Enter the new width:");
+        String heightString = JOptionPane.showInputDialog("Enter the new height:");
+
+        // Parse width and height values
+        int newWidth = Integer.parseInt(widthString);
+        int newHeight = Integer.parseInt(heightString);
+
+        // Resize the image
+        //Image resizedImage = currentImage.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT);
+
+        currentImage = resizeImageBuffer(originalImage,newWidth,newHeight);
+
+        // Update the original image in the ImagePanel
+        imageLabel.setIcon(new ImageIcon(currentImage));
+        imageLabel.setPreferredSize(new Dimension(newWidth, newHeight));
+        imageLabel.revalidate();
+
+        // Update the original image variable
+        //currentImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+
+        // Reset the crop selection
+        isCropSelected = false;
+        cropButton.setEnabled(false);
+        cropBounds = null;
+        imageLabel.repaint();
+
+        // Display resized image in a new frame
+//        JFrame resizedFrame = new JFrame("Resized Image");
+//        JLabel resizedLabel = new JLabel(new ImageIcon(resizedImage));
+//        resizedFrame.getContentPane().add(resizedLabel);
+//        resizedFrame.pack();
+//        resizedFrame.setLocationRelativeTo(null);
+//        resizedFrame.setVisible(true);
+    }
+
+    public static BufferedImage resizeImageBuffer(BufferedImage originalImage, int newWidth, int newHeight) {
+        BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, originalImage.getType());
+
+        Graphics2D g2d = resizedImage.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2d.drawImage(originalImage, 0, 0, newWidth, newHeight, null);
+        g2d.dispose();
+
+        return resizedImage;
+    }
+
+    private class CustomMouseListener extends MouseAdapter {
+        private Point startPoint;
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            startPoint = e.getPoint();
+            isCropSelected = false;
+            imageLabel.repaint();
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            int x = Math.min(startPoint.x, e.getX());
+            int y = Math.min(startPoint.y, e.getY());
+            int width = Math.abs(startPoint.x - e.getX());
+            int height = Math.abs(startPoint.y - e.getY());
+            cropBounds = new Rectangle2D.Double(x, y, width, height);
+            cropButton.setEnabled(true);
+            isCropSelected = true;
+            imageLabel.repaint();
+        }
+    }
+
 
 }
