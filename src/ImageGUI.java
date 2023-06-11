@@ -9,7 +9,12 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,6 +40,7 @@ public class ImageGUI extends JFrame {
 
     private JButton cropButton;
     private JButton resizeButton;
+
 
     JLabel kMeanLabel = new JLabel("clusters number");
     JLabel uniformLabel = new JLabel("colors number");
@@ -83,7 +89,7 @@ public class ImageGUI extends JFrame {
         // Create the control panel
         controlPanel = new JPanel();
         controlPanel.setBackground(Color.lightGray);
-        controlPanel.setPreferredSize(new Dimension(getWidth(), 65));
+        controlPanel.setPreferredSize(new Dimension(getWidth(), 100));
 
 
         // initialize buttons
@@ -107,6 +113,7 @@ public class ImageGUI extends JFrame {
         init_ColorHistogramButton();
         init_restoreOriginalImageButton();
         init_searchByColor();
+        init_searchBySize();
 
 
         // Add the components to the frame
@@ -226,6 +233,13 @@ public class ImageGUI extends JFrame {
         JButton searchByColor = new JButton("search By Color");
         searchByColor.addActionListener(e -> new ColorInputGUI());
         controlPanel.add(searchByColor);
+
+
+    }
+    public void init_searchBySize() {
+        JButton searchBySize = new JButton("search By Size");
+        searchBySize.addActionListener(e -> searchBySize());
+        controlPanel.add(searchBySize);
 
 
     }
@@ -613,6 +627,62 @@ public class ImageGUI extends JFrame {
 //        croppedFrame.setVisible(true);
 
     }
+    private void searchBySize() {
+        // Prompt for max and min size
+        String minSizeString = JOptionPane.showInputDialog("Enter the minimum size in KB:");
+        String maxSizeString = JOptionPane.showInputDialog("Enter the maximum size in KB:");
+
+        int minSize = Integer.parseInt(minSizeString);
+        int maxSize = Integer.parseInt(maxSizeString);
+        File resultsFolder = new File(image_route.image_route+"\\size_search_results");
+        String folderPath =(image_route.image_route+"\\size_search_results");
+        resultsFolder.mkdirs();
+        JFileChooser fileChooser = new JFileChooser(image_route.image_route);
+        fileChooser.setDialogTitle("Choose one or multiple folders to search in");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setMultiSelectionEnabled(true);
+        int userSelection = fileChooser.showOpenDialog(null);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File[] chosenFolders = fileChooser.getSelectedFiles();
+
+
+            for (File folder : chosenFolders) {
+                System.out.println("Processing folder: " + folder.getName());
+                List<File> images=loopOverFolderContents(folder,minSize,maxSize,resultsFolder);
+                for(File file: images){
+                    Path destFolder = Paths.get(folderPath);
+                    try {
+                        Files.copy(file.toPath(), destFolder.resolve(file.getName()));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+            }
+        }
+
+
+    }
+    private static List<File> loopOverFolderContents(File folder,double minSize,double maxSize,File resultsFolder) {
+        File[] listOfFiles = folder.listFiles();
+        List<File> resultImages =  new ArrayList<>();
+        for (File file : listOfFiles) {
+            if (file.isFile()) {
+                if(file.length()/1024 < maxSize && file.length()/1024 > minSize){
+                    System.out.println(file.getName());
+                   resultImages.add(file);
+
+
+                }
+            } else if (file.isDirectory()) {
+                // Recursively loop over the contents of the subfolder
+                System.out.println("Entering subfolder: " + file.getName());
+                loopOverFolderContents(file,minSize,maxSize,resultsFolder);
+            }
+        }
+        return resultImages;
+    }
+
 
     private void resizeImage() {
         // Prompt for new width and height
