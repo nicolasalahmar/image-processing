@@ -284,10 +284,9 @@ public class ImageGUI extends JFrame {
         loadImage();
         double[] lab_paletteVector1;
         try {
-            lab_paletteVector1 = PicturesSimilarity.toLabVector(image_to_palette(fileChooser.getSelectedFile(),10));
-            imageLabel.setImage(currentImage);
             lab_paletteVector1 = PicturesSimilarity.toLabVector(image_to_palette(fileChooser.getSelectedFile(), 10));
             File folder = new File(image_route.indexed_image_route);
+            imageLabel.setImage(originalImage);
             ArrayList<File> files = new ArrayList<>();
             for (File file : Objects.requireNonNull(folder.listFiles())) {
                 if (file.isFile() && !file.getName().equals(".gitkeep")) {
