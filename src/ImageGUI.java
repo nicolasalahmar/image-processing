@@ -9,7 +9,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,7 +24,7 @@ public class ImageGUI extends JFrame {
         return formatName;
     }
 
-    private final JLabel imageLabel;
+    private final ImagePanel imageLabel;
     private JButton MedianCutButton;
     private JButton restoreOriginal;
     int originalImageSize, kMeanImageSize, uniformImageSize, medianCutImageSize, nearestColorImageSize;
@@ -56,6 +55,31 @@ public class ImageGUI extends JFrame {
     JFrame colorHistogramFrame = new JFrame("Color Histogram");
     long kMeanImageTime = 0, uniformImageTime = 0, medianCutImageTime = 0, nearestColorTime = 0;
 
+    class ImagePanel extends JPanel {
+
+        public void setImage(BufferedImage setImage) {
+            currentImage = setImage;
+            repaint(); // Redraw the panel with the new image
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g;
+
+            // Draw the original image
+            g2d.drawImage(currentImage, 0, 0, null);
+
+            // Draw the crop box overlay
+            if (isCropSelected) {
+                g2d.setColor(Color.PINK);
+                g2d.setStroke(new BasicStroke(2));
+                g2d.draw(cropBounds);
+                g2d.setColor(new Color(255, 255, 255, 128));
+                g2d.fill(cropBounds);
+            }
+        }
+    }
     public ImageGUI() {
 
         colorPaletteFrame.setSize(300, 200);
@@ -65,26 +89,10 @@ public class ImageGUI extends JFrame {
         setTitle("Image GUI");
 
         // Create the components
-        imageLabel = new JLabel(){
-            @Override
-            protected void paintComponent(Graphics g) {
+        imageLabel = new ImagePanel();
 
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                // Draw the crop box overlay
-                if (isCropSelected) {
-                    g2d.setColor(Color.PINK);
-                    g2d.setStroke(new BasicStroke(2));
-                    g2d.draw(cropBounds);
-                    g2d.setColor(new Color(255, 255, 255, 128));
-                    g2d.fill(cropBounds);
-                }
-            }
-
-        };
-
-        imageLabel.setHorizontalAlignment(JLabel.CENTER);
-        imageLabel.setVerticalAlignment(JLabel.CENTER);
+//        imageLabel.setHorizontalAlignment(JLabel.CENTER);
+//        imageLabel.setVerticalAlignment(JLabel.CENTER);
 
         // Create the control panel
         controlPanel = new JPanel();
@@ -178,7 +186,7 @@ public class ImageGUI extends JFrame {
     }
 
     public void indexed(indexed_image i) {
-        imageLabel.setIcon(new ImageIcon(i.constructed_image));
+        imageLabel.setImage(i.constructed_image);
     }
 
     public void init_KmeansButton() {
@@ -250,7 +258,7 @@ public class ImageGUI extends JFrame {
             try {
                 originalImage = ImageIO.read(fileChooser.getSelectedFile());
                 imageLabel.setPreferredSize(new Dimension(originalImage.getWidth(), originalImage.getHeight()));
-                imageLabel.setIcon(new ImageIcon(originalImage));
+                imageLabel.setImage(originalImage);
 
                 resizeButton.setEnabled(true);
 
@@ -277,7 +285,7 @@ public class ImageGUI extends JFrame {
         double[] lab_paletteVector1;
         try {
             lab_paletteVector1 = PicturesSimilarity.toLabVector(image_to_palette(fileChooser.getSelectedFile(),10));
-            imageLabel.setIcon(new ImageIcon(originalImage));
+            imageLabel.setImage(originalImage);
             File folder = new File(image_route.indexed_image_route);
             for (File file : Objects.requireNonNull(folder.listFiles())) {
                 if (file.isFile() && !file.getName().equals(".gitkeep")) {
@@ -329,7 +337,7 @@ public class ImageGUI extends JFrame {
 
         fileChooser.setSelectedFile(new File("original." + formatName));
         currentImage = originalImage;
-        imageLabel.setIcon(new ImageIcon(originalImage));
+        imageLabel.setImage(originalImage);
 
     }
 
@@ -340,7 +348,7 @@ public class ImageGUI extends JFrame {
         long endTime = System.nanoTime();
         uniformImageTime = endTime - startTime;
         currentImage = quantizedImage;
-        imageLabel.setIcon(new ImageIcon(quantizedImage));
+        imageLabel.setImage(quantizedImage);
         uniformImageSize = getImageSize(quantizedImage);
 
     }
@@ -355,7 +363,7 @@ public class ImageGUI extends JFrame {
         long endTime = System.nanoTime();
         nearestColorTime = endTime - startTime;
         currentImage = nearestColorImage;
-        imageLabel.setIcon(new ImageIcon(nearestColorImage));
+        imageLabel.setImage(nearestColorImage);
         nearestColorImageSize = getImageSize(nearestColorImage);
 
     }
@@ -367,7 +375,7 @@ public class ImageGUI extends JFrame {
         long endTime = System.nanoTime();
         kMeanImageTime = endTime - startTime;
         currentImage = quantizedImage;
-        imageLabel.setIcon(new ImageIcon(quantizedImage));
+        imageLabel.setImage(quantizedImage);
         kMeanImageSize = getImageSize(quantizedImage);
     }
 
@@ -381,7 +389,7 @@ public class ImageGUI extends JFrame {
         long endTime = System.nanoTime();
         medianCutImageTime = endTime - startTime;
         currentImage = quantizedImage;
-        imageLabel.setIcon(new ImageIcon(quantizedImage));
+        imageLabel.setImage(quantizedImage);
         medianCutImageSize = getImageSize(quantizedImage);
 
     }
@@ -413,7 +421,7 @@ public class ImageGUI extends JFrame {
         long endTime = System.nanoTime();
         medianCutImageTime = endTime - startTime;
         currentImage = quantizedImage;
-        imageLabel.setIcon(new ImageIcon(quantizedImage));
+        imageLabel.setImage(quantizedImage);
         medianCutImageSize = getImageSize(quantizedImage);
     }
 
@@ -610,8 +618,8 @@ public class ImageGUI extends JFrame {
         currentImage = currentImage.getSubimage(x, y, width, height);
 
         //Update the original image in the image panel
-        imageLabel.setIcon(new ImageIcon(currentImage));
-
+        imageLabel.setImage(currentImage);
+        imageLabel.setPreferredSize(new Dimension(currentImage.getWidth(), currentImage.getHeight()));
         // Reset the crop selection
         isCropSelected = false;
         cropButton.setEnabled(false);
@@ -699,7 +707,7 @@ public class ImageGUI extends JFrame {
         currentImage = resizeImageBuffer(originalImage,newWidth,newHeight);
 
         // Update the original image in the ImagePanel
-        imageLabel.setIcon(new ImageIcon(currentImage));
+        imageLabel.setImage(currentImage);
         imageLabel.setPreferredSize(new Dimension(newWidth, newHeight));
         imageLabel.revalidate();
 
