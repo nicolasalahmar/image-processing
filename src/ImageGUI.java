@@ -3,6 +3,8 @@ import color_quantization_algorithms.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
@@ -14,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -122,6 +125,7 @@ public class ImageGUI extends JFrame {
         init_restoreOriginalImageButton();
         init_searchByColor();
         init_searchBySize();
+        init_searchByDate();
 
 
         // Add the components to the frame
@@ -250,6 +254,20 @@ public class ImageGUI extends JFrame {
         controlPanel.add(searchBySize);
 
 
+    }
+    public void init_searchByDate() {
+
+        DatePickerPanel datePickerPanel = new DatePickerPanel();
+        controlPanel.add(datePickerPanel, BorderLayout.CENTER);
+
+        JButton retrieveButton = new JButton("Search By Date");
+        retrieveButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Date selectedDate = datePickerPanel.getSelectedDate();
+                System.out.println("Selected date: " + selectedDate);
+            }
+        });
+        controlPanel.add(retrieveButton, BorderLayout.SOUTH);
     }
 
     public void loadImage() {
