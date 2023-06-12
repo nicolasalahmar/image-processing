@@ -43,20 +43,7 @@ public class ColorInputGUI {
             componentFields.add(field);
             inputPanel.add(field);
         }
-        Color c = new Color(27, 59, 51);
-        Color c2 = new Color(28, 60, 28);
-        Color c3 = new Color(45, 77, 66);
 
-        Color c11 = new Color(86, 59, 114);
-        Color c22 = new Color(205, 106, 135);
-        Color c33 = new Color(229, 92, 146);
-        Color c44 = new Color(100, 37, 61);
-
-
-        Color c111 = new Color(102, 34, 0);
-        Color c222 = new Color(174, 68, 35);
-        Color c333 = new Color(191, 99, 0);
-        Color c444 = new Color(242, 82, 8);
 
         buttonPanel.add(nextButton);
         submitButton.addActionListener(new SubmitListener());
@@ -94,7 +81,7 @@ public class ColorInputGUI {
         File folder = new File(image_route.indexed_image_route);
         for (File file : Objects.requireNonNull(folder.listFiles())) {
             if (file.isFile() && !file.getName().equals(".gitkeep")) {
-                palette = im.image_to_palette(file,30);
+                palette = im.image_to_palette(file,20);
                 for (Color color : palette) {
                     double maxSimilarity = 0;
                     List<Color> c1 = new ArrayList<>();
@@ -116,10 +103,8 @@ public class ColorInputGUI {
                 for (double score : similarityScores) {
                     similaritySum += score;
                 }
-                System.out.println(file.getName());
                 double similarityAverage = similaritySum / similarityScores.size();
-                System.out.println(similarityAverage+"\n"+"--------------------------");
-                if(similarityAverage>0.88){
+                if(similarityAverage>0.70){
                 try {
                     ImageIO.write(im.currentImage, im.getFormatName(), new File(image_route.byColor, file.getName()));
                 } catch (IOException e) {
