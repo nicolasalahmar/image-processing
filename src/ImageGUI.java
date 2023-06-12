@@ -263,8 +263,10 @@ public class ImageGUI extends JFrame {
         JButton retrieveButton = new JButton("Search By Date");
         retrieveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+
                 Date selectedDate = datePickerPanel.getSelectedDate();
                 System.out.println("Selected date: " + selectedDate);
+
             }
         });
         controlPanel.add(retrieveButton, BorderLayout.SOUTH);
