@@ -1,10 +1,11 @@
-import color_quantization_algorithms.*;
+import color_quantization_algorithms.KMeansQuantizer;
+import color_quantization_algorithms.MediaCutNew;
+import color_quantization_algorithms.NearestColorAlgorithm;
+import color_quantization_algorithms.UniformQuantization;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
@@ -16,15 +17,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 public class ImageGUI extends JFrame {
     private final String formatName = "png";
 
-    public String getFormatName() {
-        return formatName;
-    }
+   // public String getFormatName() {
+   //     return formatName;
+   // }
 
      final ImagePanel imageLabel;
     int originalImageSize, kMeanImageSize, uniformImageSize, medianCutImageSize, nearestColorImageSize;
@@ -37,7 +39,7 @@ public class ImageGUI extends JFrame {
     private Rectangle2D cropBounds;
     private boolean isCropSelected;
 
-    private JButton restoreOriginal,cropButton,resizeButton,uniformButton,nearestColorButton,colorPaletteButton,colorHistogramButton,compareButton,findSimilarImagesButton,kmeansButton,saveIndexedImageButton,saveImageButton,medianCutButton;
+    private JButton searchByDateButton,restoreOriginal,cropButton,resizeButton,uniformButton,nearestColorButton,colorPaletteButton,colorHistogramButton,compareButton,findSimilarImagesButton,kmeansButton,saveIndexedImageButton,saveImageButton,medianCutButton;
 
 
 
@@ -51,6 +53,7 @@ public class ImageGUI extends JFrame {
     JSpinner medianCutSpinner,kMeansSpinner, uniformSpinner, nearestSpinner;
     JPanel controlPanel;
     JPanel colorPalettePanel = new JPanel(new GridLayout(0, 5));
+    JPanel datePanel = new JPanel();
     JFrame colorPaletteFrame = new JFrame("Color Palette");
     JFrame colorHistogramFrame = new JFrame("Color Histogram");
     long kMeanImageTime = 0, uniformImageTime = 0, medianCutImageTime = 0, nearestColorTime = 0;
@@ -129,6 +132,9 @@ public class ImageGUI extends JFrame {
         add(imageLabel, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
         add(colorPalettePanel, BorderLayout.NORTH);
+        add(datePanel,BorderLayout.CENTER);
+
+
     }
 
     public void init_UniformButton() {
@@ -255,22 +261,7 @@ public class ImageGUI extends JFrame {
 
 
     }
-//   private void searchByColor(){
-//       ColorInputGUI colorInputGUI = new ColorInputGUI();
-//       // Display the GUI to the user and wait for the user to submit colors
-//       while (colorInputGUI.submitButton.getParent() != null) {
-//           try {
-//               Thread.sleep(100);
-//           } catch (InterruptedException e) {
-//               e.printStackTrace();
-//           }
-//       }
-//
-//       // Retrieve the list of submitted colors
-//       List<Color> colors = ColorInputGUI.getColors();
-//       System.out.println("Submitted colors: " + colors);
-//
-//   }
+
     public void init_searchBySize() {
         JButton searchBySize = new JButton("search By Size");
         searchBySize.addActionListener(e -> searchBySize());
@@ -280,23 +271,27 @@ public class ImageGUI extends JFrame {
     }
     public void init_searchByDate() {
 
-     //   DatePickerPanel datePickerPanel = new DatePickerPanel();
-    //    controlPanel.add(datePickerPanel, BorderLayout.CENTER);
 
-        JButton retrieveButton = new JButton("Search By Date");
-        retrieveButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        searchByDateButton = new JButton("Search By Date");
+        searchByDateButton.addActionListener(e -> searchByDate());
+        controlPanel.add(searchByDateButton);
 
-           //     Date selectedDate = datePickerPanel.getSelectedDate();
-            //    System.out.println("Selected date: " + selectedDate);
+    }
+    private void searchByDate() {
+        DatePicker datePicker = new DatePicker(this);
+        datePicker.setVisible(true);
+       Date startDate = datePicker.getStartDateChooser().getDate();
+       Date endDate = datePicker.getEndDateChooser().getDate();
+        System.out.println("Start Date: " + startDate);
+        System.out.println("End Date: " + endDate);
 
-            }
-        });
-        controlPanel.add(retrieveButton, BorderLayout.SOUTH);
+
+
     }
 
     public void loadImage() {
         int result = fileChooser.showOpenDialog(this);
+
         if (result == JFileChooser.APPROVE_OPTION) {
             try {
                 originalImage = ImageIO.read(fileChooser.getSelectedFile());
