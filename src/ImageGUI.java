@@ -19,7 +19,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 public class ImageGUI extends JFrame {
     private final String formatName = "png";
@@ -168,7 +167,13 @@ public class ImageGUI extends JFrame {
     public void init_findSimilarImagesButton() {
         findSimilarImagesButton = new JButton("find similar images");
         findSimilarImagesButton.setEnabled(false);
-        findSimilarImagesButton.addActionListener(e -> findSimilarImages());
+        findSimilarImagesButton.addActionListener(e -> {
+            try {
+                findSimilarImages();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         controlPanel.add(findSimilarImagesButton);
     }
     public void init_saveImageButton() {
@@ -268,31 +273,68 @@ public class ImageGUI extends JFrame {
         ColorPalette colorPalette = new ColorPalette();
         return colorPalette.createColorPalette(currentImage, colorPaletteSize);
     }
-    public void findSimilarImages() {
+    public void findSimilarImages() throws IOException {
         loadImage();
-        double[] lab_paletteVector1;
-        try {
-            lab_paletteVector1 = PicturesSimilarity.toLabVector(image_to_palette(fileChooser.getSelectedFile(), 10));
-            File folder = new File(image_route.indexed_image_route);
-            imageLabel.setImage(originalImage);
-            ArrayList<File> files = new ArrayList<>();
-            for (File file : Objects.requireNonNull(folder.listFiles())) {
-                if (file.isFile() && !file.getName().equals(".gitkeep")) {
-                    double[] lab_paletteVector2 = PicturesSimilarity.toLabVector(image_to_palette(file, 10));
-                    // System.out.printf(file.getName() + ":  %.2f\n", PicturesSimilarity.computeCosineSimilarity(lab_paletteVector1, lab_paletteVector2));
-                    // System.out.printf(file.getName() + ":  %.2f\n", PicturesSimilarity.euclideanDistance(lab_paletteVector1, lab_paletteVector2));
-                    if (PicturesSimilarity.cosineSimilarity(lab_paletteVector1, lab_paletteVector2) > 0.75) {
-                        //  System.out.println(file.getName() + "\n" + "--------------------------");
-                        files.add(file);
+        double[] lab_paletteVector1 = PicturesSimilarity.toLabVector(image_to_palette(fileChooser.getSelectedFile(), 10));
+        File resultsFolder = new File(image_route.image_route+"\\size_search_results");
+        String folderPath =(image_route.image_route+"\\size_search_results");
+        resultsFolder.mkdirs();
+        JFileChooser fileChooser = new JFileChooser(image_route.image_route);
+        fileChooser.setDialogTitle("Choose one or multiple folders to search in");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setMultiSelectionEnabled(true);
+        int userSelection = fileChooser.showOpenDialog(null);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File[] chosenFolders = fileChooser.getSelectedFiles();
+
+            for (File folder : chosenFolders) {
+                System.out.println("Processing folder: " + folder.getName());
+                ArrayList<File> images= (ArrayList<File>) loopOverFolderContentsAndCompareSimilarity(folder,lab_paletteVector1,resultsFolder);
+                DisplayPicsList.setImages(images);
+                DisplayPicsList.display();
+                for(File file: images){
+                    Path destFolder = Paths.get(folderPath);
+                    try {
+                        if(!Files.exists(destFolder.resolve(file.getName()))){
+                            Files.copy(file.toPath(), destFolder.resolve(file.getName()));
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
                 }
+
             }
-            DisplayPicsList.setImages(files);
-            DisplayPicsList.display();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
+//            for (File file : Objects.requireNonNull(folder.listFiles())) {
+//        if (file.isFile() && !file.getName().equals(".gitkeep")) {
+//            double[] lab_paletteVector2 = PicturesSimilarity.toLabVector(image_to_palette(file, 10));
+//            // System.out.printf(file.getName() + ":  %.2f\n", PicturesSimilarity.computeCosineSimilarity(lab_paletteVector1, lab_paletteVector2));
+//            // System.out.printf(file.getName() + ":  %.2f\n", PicturesSimilarity.euclideanDistance(lab_paletteVector1, lab_paletteVector2));
+//            if (PicturesSimilarity.cosineSimilarity(lab_paletteVector1, lab_paletteVector2) > 0.75) {
+//                //  System.out.println(file.getName() + "\n" + "--------------------------");
+//                files.add(file);
+//            }
+//        }
+//    }
+private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, double[] lab_paletteVector1, File resultsFolder) throws IOException {
+    File[] listOfFiles = folder.listFiles();
+    List<File> resultImages =  new ArrayList<>();
+    for (File file : listOfFiles) {
+        if (file.isFile()) {
+            double[] lab_paletteVector2 = PicturesSimilarity.toLabVector(image_to_palette(file, 10));
+            if(PicturesSimilarity.cosineSimilarity(lab_paletteVector1, lab_paletteVector2) > 0.75){
+                resultImages.add(file);
+            }
+        } else if (file.isDirectory()) {
+            // Recursively loop over the contents of the subfolder
+            System.out.println("Entering subfolder: " + file.getName());
+            loopOverFolderContentsAndCompareSimilarity(file,lab_paletteVector1,resultsFolder);
+        }
+    }
+    return resultImages;
+}
+
     public void saveImage() {
         int result = fileChooser.showSaveDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
