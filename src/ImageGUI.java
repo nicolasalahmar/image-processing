@@ -276,8 +276,8 @@ public class ImageGUI extends JFrame {
     public void findSimilarImages() throws IOException {
         loadImage();
         double[] lab_paletteVector1 = PicturesSimilarity.toLabVector(image_to_palette(fileChooser.getSelectedFile(), 10));
-        File resultsFolder = new File(image_route.image_route+"\\size_search_results");
-        String folderPath =(image_route.image_route+"\\size_search_results");
+        File resultsFolder = new File(image_route.image_route+"\\similar_images_search_results");
+        String folderPath =(image_route.image_route+"\\similar_images_search_results");
         resultsFolder.mkdirs();
         JFileChooser fileChooser = new JFileChooser(image_route.image_route);
         fileChooser.setDialogTitle("Choose one or multiple folders to search in");
@@ -306,17 +306,6 @@ public class ImageGUI extends JFrame {
             }
         }
     }
-//            for (File file : Objects.requireNonNull(folder.listFiles())) {
-//        if (file.isFile() && !file.getName().equals(".gitkeep")) {
-//            double[] lab_paletteVector2 = PicturesSimilarity.toLabVector(image_to_palette(file, 10));
-//            // System.out.printf(file.getName() + ":  %.2f\n", PicturesSimilarity.computeCosineSimilarity(lab_paletteVector1, lab_paletteVector2));
-//            // System.out.printf(file.getName() + ":  %.2f\n", PicturesSimilarity.euclideanDistance(lab_paletteVector1, lab_paletteVector2));
-//            if (PicturesSimilarity.cosineSimilarity(lab_paletteVector1, lab_paletteVector2) > 0.75) {
-//                //  System.out.println(file.getName() + "\n" + "--------------------------");
-//                files.add(file);
-//            }
-//        }
-//    }
 private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, double[] lab_paletteVector1, File resultsFolder) throws IOException {
     File[] listOfFiles = folder.listFiles();
     List<File> resultImages =  new ArrayList<>();
