@@ -17,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -125,14 +124,13 @@ public class ImageGUI extends JFrame {
         init_restoreOriginalImageButton();
         init_searchByColor();
         init_searchBySize();
-        init_searchByDate();
+        //init_searchByDate();
 
 
         // Add the components to the frame
         add(imageLabel, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
         add(colorPalettePanel, BorderLayout.NORTH);
-        add(datePanel,BorderLayout.CENTER);
 
 
     }
@@ -262,6 +260,7 @@ public class ImageGUI extends JFrame {
 
     }
 
+
     public void init_searchBySize() {
         JButton searchBySize = new JButton("search By Size");
         searchBySize.addActionListener(e -> searchBySize());
@@ -269,25 +268,72 @@ public class ImageGUI extends JFrame {
 
 
     }
-    public void init_searchByDate() {
-
-
-        searchByDateButton = new JButton("Search By Date");
-        searchByDateButton.addActionListener(e -> searchByDate());
-        controlPanel.add(searchByDateButton);
-
-    }
-    private void searchByDate() {
-        DatePicker datePicker = new DatePicker(this);
-        datePicker.setVisible(true);
-       Date startDate = datePicker.getStartDateChooser().getDate();
-       Date endDate = datePicker.getEndDateChooser().getDate();
-        System.out.println("Start Date: " + startDate);
-        System.out.println("End Date: " + endDate);
-
-
-
-    }
+//    public void init_searchByDate() {
+//
+//
+//        searchByDateButton = new JButton("Search By Date");
+//        searchByDateButton.addActionListener(e -> searchByDate());
+//        controlPanel.add(searchByDateButton);
+//
+//    }
+//    private void searchByDate() {
+//        DatePicker datePicker = new DatePicker(this);
+//        datePicker.setVisible(true);
+//       Date startDate = datePicker.getStartDateChooser().getDate();
+//       Date endDate = datePicker.getEndDateChooser().getDate();
+//        System.out.println("First Date: " + startDate);
+//        System.out.println("Second Date: " + endDate);
+//
+//        File resultsFolder = new File(image_route.image_route+"\\size_search_results");
+//        String folderPath =(image_route.image_route+"\\size_search_results");
+//        resultsFolder.mkdirs();
+//        JFileChooser fileChooser = new JFileChooser(image_route.image_route);
+//        fileChooser.setDialogTitle("Choose one or multiple folders to search in");
+//        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+//        fileChooser.setMultiSelectionEnabled(true);
+//        int userSelection = fileChooser.showOpenDialog(null);
+//        if (userSelection == JFileChooser.APPROVE_OPTION) {
+//            File[] chosenFolders = fileChooser.getSelectedFiles();
+//
+//
+////            for (File folder : chosenFolders) {
+////                System.out.println("Processing folder: " + folder.getName());
+////                ArrayList<File> images= (ArrayList<File>) loopOverFolderContentsAndCheckDates(folder,startDate,endDate,resultsFolder);
+////                DisplayPicsList.setImages(images);
+////                DisplayPicsList.display();
+////                for(File file: images){
+////                    Path destFolder = Paths.get(folderPath);
+////                    try {
+////                        if(!Files.exists(destFolder.resolve(file.getName()))){
+////                            Files.copy(file.toPath(), destFolder.resolve(file.getName()));
+////                        }
+////                    } catch (IOException e) {
+////                        throw new RuntimeException(e);
+////                    }
+////                }
+////
+////            }
+//        }
+//    }
+//    private static List<File> loopOverFolderContentsAndCheckDates(File folder,Date firstDate,Date secondDate,File resultsFolder) {
+//        File[] listOfFiles = folder.listFiles();
+//        List<File> resultImages =  new ArrayList<>();
+//        for (File file : listOfFiles) {
+//            if (file.isFile()) {
+//                if(file.){
+//                    System.out.println(file.getName());
+//                    resultImages.add(file);
+//
+//
+//                }
+//            } else if (file.isDirectory()) {
+//                // Recursively loop over the contents of the subfolder
+//                System.out.println("Entering subfolder: " + file.getName());
+//                loopOverFolderContents(file,minSize,maxSize,resultsFolder);
+//            }
+//        }
+//        return resultImages;
+//    }
 
     public void loadImage() {
         int result = fileChooser.showOpenDialog(this);
@@ -295,11 +341,11 @@ public class ImageGUI extends JFrame {
         if (result == JFileChooser.APPROVE_OPTION) {
             try {
                 originalImage = ImageIO.read(fileChooser.getSelectedFile());
-
-                imageLabel.setPreferredSize(new Dimension(originalImage.getWidth(), originalImage.getHeight()));
                 imageLabel.setImage(originalImage);
+                imageLabel.setPreferredSize(new Dimension(originalImage.getWidth(), originalImage.getHeight()));
 
-                resizeButton.setEnabled(true);uniformButton.setEnabled(true);nearestColorButton.setEnabled(true);colorPaletteButton.setEnabled(true);colorHistogramButton.setEnabled(true);compareButton.setEnabled(true);findSimilarImagesButton.setEnabled(true);kmeansButton.setEnabled(true);saveIndexedImageButton.setEnabled(true);saveImageButton.setEnabled(true);medianCutButton.setEnabled(true);resizeButton.setEnabled(true);
+
+                resizeButton.setEnabled(true);uniformButton.setEnabled(true);nearestColorButton.setEnabled(true);colorPaletteButton.setEnabled(true);colorHistogramButton.setEnabled(true);compareButton.setEnabled(true);findSimilarImagesButton.setEnabled(true);kmeansButton.setEnabled(true);saveIndexedImageButton.setEnabled(true);saveImageButton.setEnabled(true);medianCutButton.setEnabled(true);resizeButton.setEnabled(true);restoreOriginal.setEnabled(true);
 
 
                 originalImageSize = getImageSize(originalImage);

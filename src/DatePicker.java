@@ -43,7 +43,7 @@ public class DatePicker extends JDialog {
         endDateChooser = new JDateChooser();
         startDateChooser.setPreferredSize(new java.awt.Dimension(150, 30));
         endDateChooser.setPreferredSize(new java.awt.Dimension(150, 30));
-        startDateChooser.getDateEditor().getUiComponent().setForeground(Color.BLACK);
+
       startDateChooser.getDateEditor().getUiComponent().setEnabled(false);
       endDateChooser.getDateEditor().getUiComponent().setEnabled(false);
 
