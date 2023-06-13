@@ -3,11 +3,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class ColorInputGUI {
     private final JFrame frame;
@@ -15,7 +18,8 @@ public class ColorInputGUI {
     private final JLabel numColorsLabel;
     private final JTextField numColorsField;
     private final List<JTextField> componentFields;
-    private final JButton submitButton, nextButton;
+    public final JButton submitButton;
+    private final JButton nextButton;
     static List<Color> colors = new ArrayList<>();
     int numColors;
     int counter = 0;
@@ -72,48 +76,93 @@ public class ColorInputGUI {
             }
         }
     }
+    private static List<File> loopOverFolderContents(File folder,List<Color>colors,File resultsFolder) {
+        File[] listOfFiles = folder.listFiles();
+        List<File> resultImages =  new ArrayList<>();
+        List<Color>palette=null;
 
-    public void searchByColor() throws IOException {
-        ImageGUI im = new ImageGUI();
-        List<Color> targetColors = getColors();
-        List<Color> palette;
-        ArrayList<Double> similarityScores = new ArrayList<>();
-        File folder = new File(image_route.indexed_image_route);
-        for (File file : Objects.requireNonNull(folder.listFiles())) {
-            if (file.isFile() && !file.getName().equals(".gitkeep")) {
-                palette = im.image_to_palette(file,20);
-                for (Color color : palette) {
-                    double maxSimilarity = 0;
-                    List<Color> c1 = new ArrayList<>();
-                    c1.add(color);
-                    double[] v1= PicturesSimilarity.toLabVector(c1);
-                    for (Color targetColor : targetColors) {
-                        List<Color> c2 = new ArrayList<>();
-                        c2.add(targetColor);
-                        double[] v2= PicturesSimilarity.toLabVector(c2);
-                        double similarity = PicturesSimilarity.cosineSimilarity(v1, v2);
+        for (File file : listOfFiles) {
 
-                        if (similarity > maxSimilarity) {
-                            maxSimilarity = similarity;
-                        }
-                    }
-                    similarityScores.add(maxSimilarity);
-                }
-                double similaritySum = 0;
-                for (double score : similarityScores) {
-                    similaritySum += score;
-                }
-                double similarityAverage = similaritySum / similarityScores.size();
-                if(similarityAverage>0.70){
+                BufferedImage image = null;
                 try {
-                    ImageIO.write(im.currentImage, im.getFormatName(), new File(image_route.byColor, file.getName()));
+                    image = ImageIO.read(file);
+                    ColorPalette colorPalette = new ColorPalette();
+                     palette = colorPalette.createColorPalette(image, 10);
                 } catch (IOException e) {
                     e.printStackTrace();
-                }}
+                }
+                boolean containsColor = false;
+
+            for (Color color1 : colors) {
+                for (Color color2 : palette) {
+                    if (colorDistance(color1,color2)<50) {
+                        containsColor = true;
+                        resultImages.add(file);
+                        break;
+                    }
+                }
+                if (containsColor) {
+                    break;
+                }
+            }
+
+
+        }
+        return resultImages;
+    }
+    public void searchByColor() throws IOException {
+
+
+        List<Color> targetColors = getColors();
+
+        File resultsFolder = new File(image_route.image_route+"\\color_search_results");
+        String folderPath =(image_route.image_route+"\\color_search_results");
+        resultsFolder.mkdirs();
+        JFileChooser fileChooser = new JFileChooser(image_route.image_route);
+        fileChooser.setDialogTitle("Choose one or multiple folders to search in");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setMultiSelectionEnabled(true);
+        int userSelection = fileChooser.showOpenDialog(null);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File[] chosenFolders = fileChooser.getSelectedFiles();
+
+
+            for (File folder : chosenFolders) {
+
+                ArrayList<File> images= (ArrayList<File>) loopOverFolderContents(folder,targetColors,resultsFolder);
+                DisplayPicsList.setImages(images);
+                DisplayPicsList.display();
+                for(File file: images){
+                    Path destFolder = Paths.get(folderPath);
+                    try {
+
+                        if(!Files.exists(destFolder.resolve(file.getName()))){
+                            Files.copy(file.toPath(), destFolder.resolve(file.getName()));
+                        }
+
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
             }
         }
     }
+    public static double colorDistance(Color color1, Color color2) {
+        int r1 = color1.getRed();
+        int g1 = color1.getGreen();
+        int b1 = color1.getBlue();
 
+        int r2 = color2.getRed();
+        int g2 = color2.getGreen();
+        int b2 = color2.getBlue();
+
+        int rDiff = r1 - r2;
+        int gDiff = g1 - g2;
+        int bDiff = b1 - b2;
+
+        return Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
+    }
     private class NextListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             inputPanel.remove(numColorsLabel);

@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,9 +26,7 @@ public class ImageGUI extends JFrame {
         return formatName;
     }
 
-    private final ImagePanel imageLabel;
-    private JButton MedianCutButton;
-    private JButton restoreOriginal;
+     final ImagePanel imageLabel;
     int originalImageSize, kMeanImageSize, uniformImageSize, medianCutImageSize, nearestColorImageSize;
     JFileChooser fileChooser = new JFileChooser(image_route.image_route);
 
@@ -40,8 +37,9 @@ public class ImageGUI extends JFrame {
     private Rectangle2D cropBounds;
     private boolean isCropSelected;
 
-    private JButton cropButton;
-    private JButton resizeButton;
+    private JButton restoreOriginal,cropButton,resizeButton,uniformButton,nearestColorButton,colorPaletteButton,colorHistogramButton,compareButton,findSimilarImagesButton,kmeansButton,saveIndexedImageButton,saveImageButton,medianCutButton;
+
+
 
 
     JLabel kMeanLabel = new JLabel("clusters number");
@@ -49,7 +47,6 @@ public class ImageGUI extends JFrame {
     JLabel nearestLabel = new JLabel("nearest color");
     JLabel medianCutLabel = new JLabel("boxes number");
 
-    JLabel colorPaletteLabel = new JLabel("colors palette number");
     SpinnerModel medianCutSpinnerModel,kMeansSpinnerModel, uniformSpinnerModel, nearestColorSpinnerModel;
     JSpinner medianCutSpinner,kMeansSpinner, uniformSpinner, nearestSpinner;
     JPanel controlPanel;
@@ -135,31 +132,36 @@ public class ImageGUI extends JFrame {
     }
 
     public void init_UniformButton() {
-        JButton uniformButton = new JButton("Uniform");
+         uniformButton = new JButton("Uniform");
+        uniformButton.setEnabled(false);
         uniformButton.addActionListener(e -> uniform());
         controlPanel.add(uniformButton);
     }
 
     public void init_NearestColor() {
-        JButton nearestColorButton = new JButton("Nearest Color");
+         nearestColorButton = new JButton("Nearest Color");
+        nearestColorButton.setEnabled(false);
         nearestColorButton.addActionListener(e -> nearestColor());
         controlPanel.add(nearestColorButton);
     }
 
     public void init_ColorPaletteButton() {
-        JButton colorPaletteButton = new JButton("show color palette");
+         colorPaletteButton = new JButton("show color palette");
+        colorPaletteButton.setEnabled(false);
         colorPaletteButton.addActionListener(e -> showColorPalette());
         controlPanel.add(colorPaletteButton);
     }
 
     public void init_ColorHistogramButton() {
-        JButton colorHistogramButton = new JButton("show color histogram");
+         colorHistogramButton = new JButton("show color histogram");
+        colorHistogramButton.setEnabled(false);
         colorHistogramButton.addActionListener(e -> showColorHistogram());
         controlPanel.add(colorHistogramButton);
     }
 
     public void init_CompareButton() {
-        JButton compareButton = new JButton("compare algorithms");
+         compareButton = new JButton("compare algorithms");
+        compareButton.setEnabled(false);
         compareButton.addActionListener(e -> compareAlgorithms());
         controlPanel.add(compareButton);
     }
@@ -171,43 +173,48 @@ public class ImageGUI extends JFrame {
     }
 
     public void init_findSimilarImagesButton() {
-        JButton findSimilarImagesButton;
         findSimilarImagesButton = new JButton("find similar images");
+        findSimilarImagesButton.setEnabled(false);
         findSimilarImagesButton.addActionListener(e -> findSimilarImages());
         controlPanel.add(findSimilarImagesButton);
     }
 
     public void init_saveImageButton() {
-        JButton saveImageButton = new JButton("save image");
+         saveImageButton = new JButton("save image");
+        saveImageButton.setEnabled(false);
         saveImageButton.addActionListener(e -> saveImage());
         controlPanel.add(saveImageButton);
     }
 
     public void init_saveIndexedImageButton() {
-        JButton saveIndexedImageButton = new JButton("save as indexed image");
+         saveIndexedImageButton = new JButton("save as indexed image");
+        saveIndexedImageButton.setEnabled(false);
         saveIndexedImageButton.addActionListener(e -> saveIndexedImage());
         controlPanel.add(saveIndexedImageButton);
     }
 
-    public void indexed(indexed_image i) {
-        imageLabel.setImage(i.constructed_image);
-    }
+//    public void indexed(indexed_image i) {
+//        imageLabel.setImage(i.constructed_image);
+//    }
 
     public void init_KmeansButton() {
-        JButton kmeansButton = new JButton("K_Means");
+         kmeansButton = new JButton("K_Means");
+        kmeansButton.setEnabled(false);
         kmeansButton.addActionListener(e -> kMean());
         controlPanel.add(kmeansButton);
     }
 
     public void init_MedianButton() {
-        JButton medianCutButton = new JButton("Median Cut");
+         medianCutButton = new JButton("Median Cut");
+        medianCutButton.setEnabled(false);
         medianCutButton.addActionListener(e -> median_cut_new());
         controlPanel.add(medianCutButton);
     }
 
 
     public void init_restoreOriginalImageButton() {
-        JButton restoreOriginal = new JButton("restore original");
+         restoreOriginal = new JButton("restore original");
+        restoreOriginal.setEnabled(false);
         restoreOriginal.addActionListener(e -> restoreOriginal());
         controlPanel.add(restoreOriginal);
     }
@@ -243,11 +250,27 @@ public class ImageGUI extends JFrame {
 
     public void init_searchByColor() {
         JButton searchByColor = new JButton("search By Color");
-        searchByColor.addActionListener(e -> new ColorInputGUI());
+        searchByColor.addActionListener(e ->  new ColorInputGUI());
         controlPanel.add(searchByColor);
 
 
     }
+//   private void searchByColor(){
+//       ColorInputGUI colorInputGUI = new ColorInputGUI();
+//       // Display the GUI to the user and wait for the user to submit colors
+//       while (colorInputGUI.submitButton.getParent() != null) {
+//           try {
+//               Thread.sleep(100);
+//           } catch (InterruptedException e) {
+//               e.printStackTrace();
+//           }
+//       }
+//
+//       // Retrieve the list of submitted colors
+//       List<Color> colors = ColorInputGUI.getColors();
+//       System.out.println("Submitted colors: " + colors);
+//
+//   }
     public void init_searchBySize() {
         JButton searchBySize = new JButton("search By Size");
         searchBySize.addActionListener(e -> searchBySize());
@@ -257,15 +280,15 @@ public class ImageGUI extends JFrame {
     }
     public void init_searchByDate() {
 
-        DatePickerPanel datePickerPanel = new DatePickerPanel();
-        controlPanel.add(datePickerPanel, BorderLayout.CENTER);
+     //   DatePickerPanel datePickerPanel = new DatePickerPanel();
+    //    controlPanel.add(datePickerPanel, BorderLayout.CENTER);
 
         JButton retrieveButton = new JButton("Search By Date");
         retrieveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                Date selectedDate = datePickerPanel.getSelectedDate();
-                System.out.println("Selected date: " + selectedDate);
+           //     Date selectedDate = datePickerPanel.getSelectedDate();
+            //    System.out.println("Selected date: " + selectedDate);
 
             }
         });
@@ -280,7 +303,8 @@ public class ImageGUI extends JFrame {
                 imageLabel.setPreferredSize(new Dimension(originalImage.getWidth(), originalImage.getHeight()));
                 imageLabel.setImage(originalImage);
 
-                resizeButton.setEnabled(true);
+                resizeButton.setEnabled(true);uniformButton.setEnabled(true);nearestColorButton.setEnabled(true);colorPaletteButton.setEnabled(true);colorHistogramButton.setEnabled(true);compareButton.setEnabled(true);findSimilarImagesButton.setEnabled(true);kmeansButton.setEnabled(true);saveIndexedImageButton.setEnabled(true);saveImageButton.setEnabled(true);medianCutButton.setEnabled(true);resizeButton.setEnabled(true);
+
 
                 originalImageSize = getImageSize(originalImage);
                 currentImage = originalImage;
@@ -298,7 +322,6 @@ public class ImageGUI extends JFrame {
         ColorPalette colorPalette = new ColorPalette();
         return colorPalette.createColorPalette(currentImage, colorPaletteSize);
     }
-
 
     public void findSimilarImages() {
         loadImage();
@@ -414,35 +437,35 @@ public class ImageGUI extends JFrame {
     }
 
 
-    private void median_cut() {
-
-        fileChooser.setSelectedFile(new File("median_cut." + formatName));
-        long startTime = System.nanoTime();
-
-        int height = originalImage.getHeight();
-        int width = originalImage.getWidth();
-        int[][] flattenedImgArray = new int[height * width][5];
-
-        int index = 0;
-        for (int rIndex = 0; rIndex < height; rIndex++) {
-            for (int cIndex = 0; cIndex < width; cIndex++) {
-                int rgb = originalImage.getRGB(cIndex, rIndex);
-                int r = (rgb >> 16) & 0xFF;
-                int g = (rgb >> 8) & 0xFF;
-                int b = rgb & 0xFF;
-                flattenedImgArray[index] = new int[]{r, g, b, rIndex, cIndex};
-                index++;
-            }
-        }
-
-        BufferedImage quantizedImage = MedianCutColorQuantization.splitIntoBuckets(originalImage, flattenedImgArray, 2);
-
-        long endTime = System.nanoTime();
-        medianCutImageTime = endTime - startTime;
-        currentImage = quantizedImage;
-        imageLabel.setImage(quantizedImage);
-        medianCutImageSize = getImageSize(quantizedImage);
-    }
+//    private void median_cut() {
+//
+//        fileChooser.setSelectedFile(new File("median_cut." + formatName));
+//        long startTime = System.nanoTime();
+//
+//        int height = originalImage.getHeight();
+//        int width = originalImage.getWidth();
+//        int[][] flattenedImgArray = new int[height * width][5];
+//
+//        int index = 0;
+//        for (int rIndex = 0; rIndex < height; rIndex++) {
+//            for (int cIndex = 0; cIndex < width; cIndex++) {
+//                int rgb = originalImage.getRGB(cIndex, rIndex);
+//                int r = (rgb >> 16) & 0xFF;
+//                int g = (rgb >> 8) & 0xFF;
+//                int b = rgb & 0xFF;
+//                flattenedImgArray[index] = new int[]{r, g, b, rIndex, cIndex};
+//                index++;
+//            }
+//        }
+//
+//        BufferedImage quantizedImage = MedianCutColorQuantization.splitIntoBuckets(originalImage, flattenedImgArray, 2);
+//
+//        long endTime = System.nanoTime();
+//        medianCutImageTime = endTime - startTime;
+//        currentImage = quantizedImage;
+//        imageLabel.setImage(quantizedImage);
+//        medianCutImageSize = getImageSize(quantizedImage);
+//    }
 
     private Integer getImageSize(BufferedImage quantizedImage) {
         ByteArrayOutputStream tmp = new ByteArrayOutputStream();
@@ -537,6 +560,7 @@ public class ImageGUI extends JFrame {
         ColorPalette colorPalette = new ColorPalette();
 
         List<Color> palette = colorPalette.createColorPalette(currentImage, 10);
+        System.out.println(palette);
 
         for (Color color : palette) {
 
@@ -605,7 +629,7 @@ public class ImageGUI extends JFrame {
         cropButton = new JButton("Crop");
         resizeButton = new JButton("Resize");
         cropButton.setEnabled(false);
-        resizeButton.setEnabled(true);
+        resizeButton.setEnabled(false);
 
         // Add components to the frame
         controlPanel.add(cropButton);
@@ -661,6 +685,7 @@ public class ImageGUI extends JFrame {
 
         int minSize = Integer.parseInt(minSizeString);
         int maxSize = Integer.parseInt(maxSizeString);
+
         File resultsFolder = new File(image_route.image_route+"\\size_search_results");
         String folderPath =(image_route.image_route+"\\size_search_results");
         resultsFolder.mkdirs();
@@ -675,11 +700,15 @@ public class ImageGUI extends JFrame {
 
             for (File folder : chosenFolders) {
                 System.out.println("Processing folder: " + folder.getName());
-                List<File> images=loopOverFolderContents(folder,minSize,maxSize,resultsFolder);
+                ArrayList<File> images= (ArrayList<File>) loopOverFolderContents(folder,minSize,maxSize,resultsFolder);
+                DisplayPicsList.setImages(images);
+                DisplayPicsList.display();
                 for(File file: images){
                     Path destFolder = Paths.get(folderPath);
                     try {
-                        Files.copy(file.toPath(), destFolder.resolve(file.getName()));
+                        if(!Files.exists(destFolder.resolve(file.getName()))){
+                            Files.copy(file.toPath(), destFolder.resolve(file.getName()));
+                        }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
