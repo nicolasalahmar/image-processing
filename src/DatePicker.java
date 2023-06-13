@@ -1,22 +1,3 @@
-//import com.toedter.calendar.JDateChooser;
-//
-//import javax.swing.*;
-//import java.util.Date;
-//
-//public class DatePickerPanel extends JPanel {
-//
-//    private JDateChooser dateChooser;
-//
-//    public DatePickerPanel() {
-//        dateChooser = new JDateChooser();
-//        add(dateChooser);
-//    }
-//
-//    public Date getSelectedDate() {
-//        return dateChooser.getDate();
-//    }
-//}
-
 import com.toedter.calendar.JDateChooser;
 
 import javax.swing.*;
@@ -25,18 +6,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class DatePicker extends JDialog {
-    private JDateChooser startDateChooser;
-    private JDateChooser endDateChooser;
-
-    private JLabel startDateLabel;
-    private JLabel endDateLabel;
+    private final JDateChooser startDateChooser;
+    private final JDateChooser endDateChooser;
 
     public DatePicker(JFrame parent) {
         super(parent, "Choose Two Dates To Search Between", true);
         setLayout(new BorderLayout());
 
-        startDateLabel = new JLabel("First Date:");
-        endDateLabel = new JLabel("Second Date:");
+        JLabel startDateLabel = new JLabel("First Date:");
+        JLabel endDateLabel = new JLabel("Second Date:");
 
 
         startDateChooser = new JDateChooser();

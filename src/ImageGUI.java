@@ -24,10 +24,6 @@ import java.util.Objects;
 public class ImageGUI extends JFrame {
     private final String formatName = "png";
 
-   // public String getFormatName() {
-   //     return formatName;
-   // }
-
      final ImagePanel imageLabel;
     int originalImageSize, kMeanImageSize, uniformImageSize, medianCutImageSize, nearestColorImageSize;
     JFileChooser fileChooser = new JFileChooser(image_route.image_route);
@@ -277,67 +273,7 @@ public class ImageGUI extends JFrame {
         controlPanel.add(searchByDateButton);
 
     }
-    private void searchByDate() {
-        DatePicker datePicker = new DatePicker(this);
-        datePicker.setVisible(true);
-       Date startDate = datePicker.getStartDateChooser().getDate();
-       Date endDate = datePicker.getEndDateChooser().getDate();
-        System.out.println("First Date: " + startDate);
-        System.out.println("Second Date: " + endDate);
 
-        File resultsFolder = new File(image_route.image_route+"\\date_search_results");
-        String folderPath =(image_route.image_route+"\\date_search_results");
-        resultsFolder.mkdirs();
-        JFileChooser fileChooser = new JFileChooser(image_route.image_route);
-        fileChooser.setDialogTitle("Choose one or multiple folders to search in");
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fileChooser.setMultiSelectionEnabled(true);
-        int userSelection = fileChooser.showOpenDialog(null);
-        if (userSelection == JFileChooser.APPROVE_OPTION) {
-            File[] chosenFolders = fileChooser.getSelectedFiles();
-
-
-            for (File folder : chosenFolders) {
-                System.out.println("Processing folder: " + folder.getName());
-                ArrayList<File> images= (ArrayList<File>) loopOverFolderContentsAndCheckDates(folder,startDate,endDate,resultsFolder);
-                DisplayPicsList.setImages(images);
-                DisplayPicsList.display();
-                for(File file: images){
-                    Path destFolder = Paths.get(folderPath);
-                    try {
-                        if(!Files.exists(destFolder.resolve(file.getName()))){
-                            Files.copy(file.toPath(), destFolder.resolve(file.getName()));
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-
-            }
-        }
-    }
-    private static List<File> loopOverFolderContentsAndCheckDates(File folder, Date firstDate, Date secondDate, File resultsFolder) {
-        File[] listOfFiles = folder.listFiles();
-        List<File> resultImages =  new ArrayList<>();
-        for (File file : listOfFiles) {
-
-            if (file.isFile()) {
-                long timestamp = file.lastModified();
-                Date fileDateTime = new Date(timestamp);
-                if(fileDateTime.compareTo(firstDate)>0&&fileDateTime.compareTo(secondDate)<0){
-                    System.out.println(file.getName());
-                    resultImages.add(file);
-
-
-                }
-            } else if (file.isDirectory()) {
-                // Recursively loop over the contents of the subfolder
-                System.out.println("Entering subfolder: " + file.getName());
-                loopOverFolderContentsAndCheckDates(file,firstDate,secondDate,resultsFolder);
-            }
-        }
-        return resultImages;
-    }
 
     public void loadImage() {
         int result = fileChooser.showOpenDialog(this);
@@ -482,36 +418,6 @@ public class ImageGUI extends JFrame {
 
     }
 
-
-//    private void median_cut() {
-//
-//        fileChooser.setSelectedFile(new File("median_cut." + formatName));
-//        long startTime = System.nanoTime();
-//
-//        int height = originalImage.getHeight();
-//        int width = originalImage.getWidth();
-//        int[][] flattenedImgArray = new int[height * width][5];
-//
-//        int index = 0;
-//        for (int rIndex = 0; rIndex < height; rIndex++) {
-//            for (int cIndex = 0; cIndex < width; cIndex++) {
-//                int rgb = originalImage.getRGB(cIndex, rIndex);
-//                int r = (rgb >> 16) & 0xFF;
-//                int g = (rgb >> 8) & 0xFF;
-//                int b = rgb & 0xFF;
-//                flattenedImgArray[index] = new int[]{r, g, b, rIndex, cIndex};
-//                index++;
-//            }
-//        }
-//
-//        BufferedImage quantizedImage = MedianCutColorQuantization.splitIntoBuckets(originalImage, flattenedImgArray, 2);
-//
-//        long endTime = System.nanoTime();
-//        medianCutImageTime = endTime - startTime;
-//        currentImage = quantizedImage;
-//        imageLabel.setImage(quantizedImage);
-//        medianCutImageSize = getImageSize(quantizedImage);
-//    }
 
     private Integer getImageSize(BufferedImage quantizedImage) {
         ByteArrayOutputStream tmp = new ByteArrayOutputStream();
@@ -659,6 +565,67 @@ public class ImageGUI extends JFrame {
         colorHistogramFrame.setLocationRelativeTo(null);
 
         colorHistogramFrame.setVisible(true);
+    }
+    private void searchByDate() {
+        DatePicker datePicker = new DatePicker(this);
+        datePicker.setVisible(true);
+        Date startDate = datePicker.getStartDateChooser().getDate();
+        Date endDate = datePicker.getEndDateChooser().getDate();
+        System.out.println("First Date: " + startDate);
+        System.out.println("Second Date: " + endDate);
+
+        File resultsFolder = new File(image_route.image_route+"\\date_search_results");
+        String folderPath =(image_route.image_route+"\\date_search_results");
+        resultsFolder.mkdirs();
+        JFileChooser fileChooser = new JFileChooser(image_route.image_route);
+        fileChooser.setDialogTitle("Choose one or multiple folders to search in");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setMultiSelectionEnabled(true);
+        int userSelection = fileChooser.showOpenDialog(null);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File[] chosenFolders = fileChooser.getSelectedFiles();
+
+
+            for (File folder : chosenFolders) {
+                System.out.println("Processing folder: " + folder.getName());
+                ArrayList<File> images= (ArrayList<File>) loopOverFolderContentsAndCheckDates(folder,startDate,endDate,resultsFolder);
+                DisplayPicsList.setImages(images);
+                DisplayPicsList.display();
+                for(File file: images){
+                    Path destFolder = Paths.get(folderPath);
+                    try {
+                        if(!Files.exists(destFolder.resolve(file.getName()))){
+                            Files.copy(file.toPath(), destFolder.resolve(file.getName()));
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+            }
+        }
+    }
+    private static List<File> loopOverFolderContentsAndCheckDates(File folder, Date firstDate, Date secondDate, File resultsFolder) {
+        File[] listOfFiles = folder.listFiles();
+        List<File> resultImages =  new ArrayList<>();
+        for (File file : listOfFiles) {
+
+            if (file.isFile()) {
+                long timestamp = file.lastModified();
+                Date fileDateTime = new Date(timestamp);
+                if(fileDateTime.compareTo(firstDate)>0&&fileDateTime.compareTo(secondDate)<0){
+                    System.out.println(file.getName());
+                    resultImages.add(file);
+
+
+                }
+            } else if (file.isDirectory()) {
+                // Recursively loop over the contents of the subfolder
+                System.out.println("Entering subfolder: " + file.getName());
+                loopOverFolderContentsAndCheckDates(file,firstDate,secondDate,resultsFolder);
+            }
+        }
+        return resultImages;
     }
 
 
