@@ -127,7 +127,8 @@ public class ColorInputGUI {
             File[] chosenFolders = fileChooser.getSelectedFiles();
 
 
-            for (File folder : chosenFolders) {
+            for (File folder : chosenFolders)
+            {
 
                 ArrayList<File> images= (ArrayList<File>) loopOverFolderContents(folder,targetColors,resultsFolder);
                 DisplayPicsList.setImages(images);

@@ -300,6 +300,7 @@ public class ImageGUI extends JFrame {
         if (result == JFileChooser.APPROVE_OPTION) {
             try {
                 originalImage = ImageIO.read(fileChooser.getSelectedFile());
+
                 imageLabel.setPreferredSize(new Dimension(originalImage.getWidth(), originalImage.getHeight()));
                 imageLabel.setImage(originalImage);
 
