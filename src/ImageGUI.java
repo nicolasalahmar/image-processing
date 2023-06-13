@@ -129,152 +129,117 @@ public class ImageGUI extends JFrame {
         add(controlPanel, BorderLayout.SOUTH);
         add(colorPalettePanel, BorderLayout.NORTH);
 
-
     }
-
     public void init_UniformButton() {
          uniformButton = new JButton("Uniform");
         uniformButton.setEnabled(false);
         uniformButton.addActionListener(e -> uniform());
         controlPanel.add(uniformButton);
     }
-
     public void init_NearestColor() {
          nearestColorButton = new JButton("Nearest Color");
         nearestColorButton.setEnabled(false);
         nearestColorButton.addActionListener(e -> nearestColor());
         controlPanel.add(nearestColorButton);
     }
-
     public void init_ColorPaletteButton() {
          colorPaletteButton = new JButton("show color palette");
         colorPaletteButton.setEnabled(false);
         colorPaletteButton.addActionListener(e -> showColorPalette());
         controlPanel.add(colorPaletteButton);
     }
-
     public void init_ColorHistogramButton() {
          colorHistogramButton = new JButton("show color histogram");
         colorHistogramButton.setEnabled(false);
         colorHistogramButton.addActionListener(e -> showColorHistogram());
         controlPanel.add(colorHistogramButton);
     }
-
     public void init_CompareButton() {
          compareButton = new JButton("compare algorithms");
         compareButton.setEnabled(false);
         compareButton.addActionListener(e -> compareAlgorithms());
         controlPanel.add(compareButton);
     }
-
     public void init_loadImageButton() {
         JButton loadImageButton = new JButton("load image");
         loadImageButton.addActionListener(e -> loadImage());
         controlPanel.add(loadImageButton);
     }
-
     public void init_findSimilarImagesButton() {
         findSimilarImagesButton = new JButton("find similar images");
         findSimilarImagesButton.setEnabled(false);
         findSimilarImagesButton.addActionListener(e -> findSimilarImages());
         controlPanel.add(findSimilarImagesButton);
     }
-
     public void init_saveImageButton() {
          saveImageButton = new JButton("save image");
         saveImageButton.setEnabled(false);
         saveImageButton.addActionListener(e -> saveImage());
         controlPanel.add(saveImageButton);
     }
-
     public void init_saveIndexedImageButton() {
          saveIndexedImageButton = new JButton("save as indexed image");
         saveIndexedImageButton.setEnabled(false);
         saveIndexedImageButton.addActionListener(e -> saveIndexedImage());
         controlPanel.add(saveIndexedImageButton);
     }
-
-//    public void indexed(indexed_image i) {
-//        imageLabel.setImage(i.constructed_image);
-//    }
-
     public void init_KmeansButton() {
          kmeansButton = new JButton("K_Means");
         kmeansButton.setEnabled(false);
         kmeansButton.addActionListener(e -> kMean());
         controlPanel.add(kmeansButton);
     }
-
     public void init_MedianButton() {
          medianCutButton = new JButton("Median Cut");
         medianCutButton.setEnabled(false);
         medianCutButton.addActionListener(e -> median_cut_new());
         controlPanel.add(medianCutButton);
     }
-
-
     public void init_restoreOriginalImageButton() {
          restoreOriginal = new JButton("restore original");
         restoreOriginal.setEnabled(false);
         restoreOriginal.addActionListener(e -> restoreOriginal());
         controlPanel.add(restoreOriginal);
     }
-
     public void init_KmeansSpinner() {
         kMeansSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
         kMeansSpinner = new JSpinner(kMeansSpinnerModel);
         controlPanel.add(kMeanLabel);
         controlPanel.add(kMeansSpinner);
     }
-
     public void init_UniformSpinner() {
-
         uniformSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
         uniformSpinner = new JSpinner(uniformSpinnerModel);
         controlPanel.add(uniformLabel);
         controlPanel.add(uniformSpinner);
     }
-
     public void init_NearestSpinner() {
         nearestColorSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
         nearestSpinner = new JSpinner(nearestColorSpinnerModel);
         controlPanel.add(nearestLabel);
         controlPanel.add(nearestSpinner);
     }
-
     public void median_cut_Spinner() {
         medianCutSpinnerModel = new SpinnerNumberModel(10, 2, 1024, 2);
         medianCutSpinner = new JSpinner(medianCutSpinnerModel);
         controlPanel.add(medianCutLabel);
         controlPanel.add(medianCutSpinner);
     }
-
     public void init_searchByColor() {
         JButton searchByColor = new JButton("search By Color");
         searchByColor.addActionListener(e ->  new ColorInputGUI());
         controlPanel.add(searchByColor);
-
-
     }
-
-
     public void init_searchBySize() {
         JButton searchBySize = new JButton("search By Size");
         searchBySize.addActionListener(e -> searchBySize());
         controlPanel.add(searchBySize);
-
-
     }
     public void init_searchByDate() {
-
-
         searchByDateButton = new JButton("Search By Date");
         searchByDateButton.addActionListener(e -> searchByDate());
         controlPanel.add(searchByDateButton);
-
     }
-
-
     public void loadImage() {
         int result = fileChooser.showOpenDialog(this);
 
@@ -296,7 +261,6 @@ public class ImageGUI extends JFrame {
             }
         }
     }
-
     public List<Color> image_to_palette(File file, int colorPaletteSize) throws IOException {
         originalImage = ImageIO.read(file);
         originalImageSize = getImageSize(originalImage);
@@ -304,7 +268,6 @@ public class ImageGUI extends JFrame {
         ColorPalette colorPalette = new ColorPalette();
         return colorPalette.createColorPalette(currentImage, colorPaletteSize);
     }
-
     public void findSimilarImages() {
         loadImage();
         double[] lab_paletteVector1;
@@ -330,8 +293,6 @@ public class ImageGUI extends JFrame {
             throw new RuntimeException(e);
         }
     }
-
-
     public void saveImage() {
         int result = fileChooser.showSaveDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
@@ -343,7 +304,6 @@ public class ImageGUI extends JFrame {
             }
         }
     }
-
     public void saveIndexedImage() {
         int result = fileChooser.showSaveDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
@@ -356,15 +316,11 @@ public class ImageGUI extends JFrame {
             }
         }
     }
-
     private void restoreOriginal() {
-
         fileChooser.setSelectedFile(new File("original." + formatName));
         currentImage = originalImage;
         imageLabel.setImage(originalImage);
-
     }
-
     private void uniform() {
         fileChooser.setSelectedFile(new File("uniform." + formatName));
         long startTime = System.nanoTime();
@@ -374,9 +330,7 @@ public class ImageGUI extends JFrame {
         currentImage = quantizedImage;
         imageLabel.setImage(quantizedImage);
         uniformImageSize = getImageSize(quantizedImage);
-
     }
-
     private void nearestColor() {
         ColorPalette colorPalette = new ColorPalette();
         List<Color> palette = colorPalette.createColorPalette(originalImage, (int) nearestColorSpinnerModel.getValue());
@@ -391,7 +345,6 @@ public class ImageGUI extends JFrame {
         nearestColorImageSize = getImageSize(nearestColorImage);
 
     }
-
     private void kMean() {
         fileChooser.setSelectedFile(new File("kMean." + formatName));
         long startTime = System.nanoTime();
@@ -402,7 +355,6 @@ public class ImageGUI extends JFrame {
         imageLabel.setImage(quantizedImage);
         kMeanImageSize = getImageSize(quantizedImage);
     }
-
     private void median_cut_new() {
 
         fileChooser.setSelectedFile(new File("median_cut."+formatName));
@@ -415,10 +367,7 @@ public class ImageGUI extends JFrame {
         currentImage = quantizedImage;
         imageLabel.setImage(quantizedImage);
         medianCutImageSize = getImageSize(quantizedImage);
-
     }
-
-
     private Integer getImageSize(BufferedImage quantizedImage) {
         ByteArrayOutputStream tmp = new ByteArrayOutputStream();
         try {
@@ -432,7 +381,6 @@ public class ImageGUI extends JFrame {
             throw new RuntimeException(e);
         }
         return tmp.size() / 1024;
-
     }
 
     private void compareAlgorithms() {
@@ -448,7 +396,6 @@ public class ImageGUI extends JFrame {
         double minimumSize = Math.min(Math.min(Math.min(kMeanImageSize,medianCutImageSize),uniformImageSize),nearestColorImageSize);
         double minimumTime = Math.min(Math.min(Math.min(kMeanImageTime,medianCutImageTime),uniformImageTime),nearestColorTime);
 
-
         if (minimumSize == kMeanImageSize) {
             bestAlgorithmInSize = "K Means";
         }
@@ -461,8 +408,6 @@ public class ImageGUI extends JFrame {
         else {
             bestAlgorithmInSize = "Nearest Color";
         }
-
-
         if (minimumTime == kMeanImageTime) {
             bestAlgorithmInTime = "K Means";
         }
@@ -501,8 +446,6 @@ public class ImageGUI extends JFrame {
 
         JOptionPane.showMessageDialog(null, message);
     }
-
-
     private void showColorPalette() {
         // Clear the color palette panel.
         colorPalettePanel.removeAll();
@@ -512,30 +455,22 @@ public class ImageGUI extends JFrame {
         ColorPalette colorPalette = new ColorPalette();
 
         List<Color> palette = colorPalette.createColorPalette(currentImage, 10);
-        System.out.println(palette);
 
         for (Color color : palette) {
-
             JLabel label = new JLabel();
-
             //the label will fill its entire background with its background color.
             // If the label were not opaque, it would be transparent,
             // and you would be able to see through it to the background behind it
             label.setOpaque(true);
-
             // Set the label's background to the current color.
             label.setBackground(color);
-
             // Add the label to the color palette panel.
             colorPalettePanel.add(label);
         }
-
         // Add the color palette panel to the frame.
         colorPaletteFrame.getContentPane().add(colorPalettePanel);
-
         colorPaletteFrame.setVisible(true);
     }
-
     private void showColorHistogram() {
         // Clear the color palette panel.
         colorPalettePanel.removeAll();
@@ -627,70 +562,6 @@ public class ImageGUI extends JFrame {
         }
         return resultImages;
     }
-
-
-    /////////////////////// image cropper start here ////////////////////////////
-
-    /////////////////////////////
-
-    /////////////////////// image cropper start here ////////////////////////////
-
-    public void ImageCropper() {
-
-
-        // Create components
-        cropButton = new JButton("Crop");
-        resizeButton = new JButton("Resize");
-        cropButton.setEnabled(false);
-        resizeButton.setEnabled(false);
-
-        // Add components to the frame
-        controlPanel.add(cropButton);
-        controlPanel.add(resizeButton);
-        add(controlPanel, BorderLayout.SOUTH);
-
-
-        // Add mouse listener to the image panel
-        imageLabel.addMouseListener(new CustomMouseListener());
-
-        // Add action listener to the crop button
-        cropButton.addActionListener(e -> cropImage());
-
-        // Add action listener to the resize button
-        resizeButton.addActionListener(e -> resizeImage());
-
-        // Set the frame size based on the image size
-        pack();
-        setLocationRelativeTo(null);
-        setVisible(true);
-    }
-
-
-    private void cropImage() {
-        int x = (int) cropBounds.getX();
-        int y = (int) cropBounds.getY() ;
-        int width = (int) cropBounds.getWidth();
-        int height = (int) cropBounds.getHeight();
-        currentImage = currentImage.getSubimage(x, y, width, height);
-
-        //Update the original image in the image panel
-        imageLabel.setImage(currentImage);
-        imageLabel.setPreferredSize(new Dimension(currentImage.getWidth(), currentImage.getHeight()));
-        // Reset the crop selection
-        isCropSelected = false;
-        cropButton.setEnabled(false);
-        cropBounds = null;
-        imageLabel.repaint();
-
-        // Display cropped image in a new frame
-//        JFrame croppedFrame = new JFrame("Cropped Image");
-//        JLabel croppedLabel = new JLabel(new ImageIcon(currentImage));
-//        croppedFrame.getContentPane().add(croppedLabel);
-//        croppedFrame.pack();
-//        croppedFrame.setLocationRelativeTo(null);
-//        croppedFrame.setVisible(true);
-
-    }
     private void searchBySize() {
         // Prompt for max and min size
         String minSizeString = JOptionPane.showInputDialog("Enter the minimum size in KB:");
@@ -698,7 +569,7 @@ public class ImageGUI extends JFrame {
 
         int minSize = Integer.parseInt(minSizeString);
         int maxSize = Integer.parseInt(maxSizeString);
-
+        //making the results folder
         File resultsFolder = new File(image_route.image_route+"\\size_search_results");
         String folderPath =(image_route.image_route+"\\size_search_results");
         resultsFolder.mkdirs();
@@ -710,10 +581,9 @@ public class ImageGUI extends JFrame {
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File[] chosenFolders = fileChooser.getSelectedFiles();
 
-
             for (File folder : chosenFolders) {
                 System.out.println("Processing folder: " + folder.getName());
-                ArrayList<File> images= (ArrayList<File>) loopOverFolderContents(folder,minSize,maxSize,resultsFolder);
+                ArrayList<File> images= (ArrayList<File>) loopOverFolderContentsAndCompareSize(folder,minSize,maxSize,resultsFolder);
                 DisplayPicsList.setImages(images);
                 DisplayPicsList.display();
                 for(File file: images){
@@ -729,67 +599,79 @@ public class ImageGUI extends JFrame {
 
             }
         }
-
-
     }
-    private static List<File> loopOverFolderContents(File folder,double minSize,double maxSize,File resultsFolder) {
+    private static List<File> loopOverFolderContentsAndCompareSize(File folder,double minSize,double maxSize,File resultsFolder) {
         File[] listOfFiles = folder.listFiles();
         List<File> resultImages =  new ArrayList<>();
         for (File file : listOfFiles) {
             if (file.isFile()) {
                 if(file.length()/1024 < maxSize && file.length()/1024 > minSize){
-
-                   resultImages.add(file);
-
-
+                    resultImages.add(file);
                 }
             } else if (file.isDirectory()) {
                 // Recursively loop over the contents of the subfolder
                 System.out.println("Entering subfolder: " + file.getName());
-                loopOverFolderContents(file,minSize,maxSize,resultsFolder);
+                loopOverFolderContentsAndCompareSize(file,minSize,maxSize,resultsFolder);
             }
         }
         return resultImages;
     }
 
-
-    private void resizeImage() {
-        // Prompt for new width and height
-        String widthString = JOptionPane.showInputDialog("Enter the new width:");
-        String heightString = JOptionPane.showInputDialog("Enter the new height:");
-
-        // Parse width and height values
-        int newWidth = Integer.parseInt(widthString);
-        int newHeight = Integer.parseInt(heightString);
-
-        // Resize the image
-        //Image resizedImage = currentImage.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT);
-
-        currentImage = resizeImageBuffer(originalImage,newWidth,newHeight);
-
-        // Update the original image in the ImagePanel
+    public void ImageCropper() {
+        // Create components
+        cropButton = new JButton("Crop");
+        resizeButton = new JButton("Resize");
+        cropButton.setEnabled(false);
+        resizeButton.setEnabled(false);
+        // Add components to the frame
+        controlPanel.add(cropButton);
+        controlPanel.add(resizeButton);
+        add(controlPanel, BorderLayout.SOUTH);
+        // Add mouse listener to the image panel
+        imageLabel.addMouseListener(new CustomMouseListener());
+        // Add action listener to the crop button
+        cropButton.addActionListener(e -> cropImage());
+        // Add action listener to the resize button
+        resizeButton.addActionListener(e -> resizeImage());
+        // Set the frame size based on the image size
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+    private void cropImage() {
+        int x = (int) cropBounds.getX();
+        int y = (int) cropBounds.getY() ;
+        int width = (int) cropBounds.getWidth();
+        int height = (int) cropBounds.getHeight();
+        currentImage = currentImage.getSubimage(x, y, width, height);
+        //Update the original image in the image panel
         imageLabel.setImage(currentImage);
-        imageLabel.setPreferredSize(new Dimension(newWidth, newHeight));
-        imageLabel.revalidate();
-
-        // Update the original image variable
-        //currentImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
-
+        imageLabel.setPreferredSize(new Dimension(currentImage.getWidth(), currentImage.getHeight()));
         // Reset the crop selection
         isCropSelected = false;
         cropButton.setEnabled(false);
         cropBounds = null;
         imageLabel.repaint();
-
-        // Display resized image in a new frame
-//        JFrame resizedFrame = new JFrame("Resized Image");
-//        JLabel resizedLabel = new JLabel(new ImageIcon(resizedImage));
-//        resizedFrame.getContentPane().add(resizedLabel);
-//        resizedFrame.pack();
-//        resizedFrame.setLocationRelativeTo(null);
-//        resizedFrame.setVisible(true);
     }
-
+    private void resizeImage() {
+        // Prompt for new width and height
+        String widthString = JOptionPane.showInputDialog("Enter the new width:");
+        String heightString = JOptionPane.showInputDialog("Enter the new height:");
+        // Parse width and height values
+        int newWidth = Integer.parseInt(widthString);
+        int newHeight = Integer.parseInt(heightString);
+        // Resize the image
+        currentImage = resizeImageBuffer(originalImage,newWidth,newHeight);
+        // Update the original image in the ImagePanel
+        imageLabel.setImage(currentImage);
+        imageLabel.setPreferredSize(new Dimension(newWidth, newHeight));
+        imageLabel.revalidate();
+        // Reset the crop selection
+        isCropSelected = false;
+        cropButton.setEnabled(false);
+        cropBounds = null;
+        imageLabel.repaint();
+    }
     public static BufferedImage resizeImageBuffer(BufferedImage originalImage, int newWidth, int newHeight) {
         BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, originalImage.getType());
 
@@ -800,10 +682,8 @@ public class ImageGUI extends JFrame {
 
         return resizedImage;
     }
-
     private class CustomMouseListener extends MouseAdapter {
         private Point startPoint;
-
         @Override
         public void mousePressed(MouseEvent e) {
             startPoint = e.getPoint();
