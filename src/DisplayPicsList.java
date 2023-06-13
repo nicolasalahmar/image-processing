@@ -35,6 +35,7 @@ public class DisplayPicsList extends javax.swing.JFrame {
     // display the image by index
     public void showImage(int index) {
         ArrayList<File> imagesList = getImages();
+
         File file = imagesList.get(index);
         Image image;
         try {
@@ -139,21 +140,24 @@ public class DisplayPicsList extends javax.swing.JFrame {
 
 
     public static void display() {
+if(!images_files.isEmpty()){
 
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+    try {
+        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+            if ("Nimbus".equals(info.getName())) {
+                javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                break;
             }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
-                 UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DisplayPicsList.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-
-        java.awt.EventQueue.invokeLater(() -> new DisplayPicsList().setVisible(true));
+    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
+             UnsupportedLookAndFeelException ex) {
+        java.util.logging.Logger.getLogger(DisplayPicsList.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
+
+    java.awt.EventQueue.invokeLater(() -> new DisplayPicsList().setVisible(true));
+}  else{System.out.println("No Results Found !!");}
+}
+
 
 
 }
