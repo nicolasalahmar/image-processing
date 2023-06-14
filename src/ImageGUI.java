@@ -674,10 +674,15 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
         int y = (int) cropBounds.getY() ;
         int width = (int) cropBounds.getWidth();
         int height = (int) cropBounds.getHeight();
-        currentImage = currentImage.getSubimage(x, y, width, height);
+        try {
+            currentImage = currentImage.getSubimage(x, y, width, height);
+        }catch (Exception e){
+            System.out.println("Crop failed outside of Raster");
+        }
         //Update the original image in the image panel
         imageLabel.setImage(currentImage);
         imageLabel.setPreferredSize(new Dimension(currentImage.getWidth(), currentImage.getHeight()));
+
         // Reset the crop selection
         isCropSelected = false;
         cropButton.setEnabled(false);
