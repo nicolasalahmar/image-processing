@@ -537,8 +537,6 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
         datePicker.setVisible(true);
         Date startDate = datePicker.getStartDateChooser().getDate();
         Date endDate = datePicker.getEndDateChooser().getDate();
-        System.out.println("First Date: " + startDate);
-        System.out.println("Second Date: " + endDate);
 
         File resultsFolder = new File(image_route.image_route+"\\date_search_results");
         String folderPath =(image_route.image_route+"\\date_search_results");
@@ -597,9 +595,16 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
         // Prompt for max and min size
         String minSizeString = JOptionPane.showInputDialog("Enter the minimum size in KB:");
         String maxSizeString = JOptionPane.showInputDialog("Enter the maximum size in KB:");
+        int minSize = 0;
+        int maxSize=0;
+if(maxSizeString != null){
+     minSize = Integer.parseInt(minSizeString);
+}
+if (maxSizeString != null){
+     maxSize = Integer.parseInt(maxSizeString);
+}
 
-        int minSize = Integer.parseInt(minSizeString);
-        int maxSize = Integer.parseInt(maxSizeString);
+
         //making the results folder
         File resultsFolder = new File(image_route.image_route+"\\size_search_results");
         String folderPath =(image_route.image_route+"\\size_search_results");
