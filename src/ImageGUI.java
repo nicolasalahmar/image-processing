@@ -254,7 +254,10 @@ public class ImageGUI extends JFrame {
     }
     public void loadImage() {
         int result = fileChooser.showOpenDialog(this);
-        ImagePanel.getFormatName(fileChooser.getSelectedFile().getName());
+        if(fileChooser.getSelectedFile() !=null){
+            ImagePanel.getFormatName(fileChooser.getSelectedFile().getName());
+
+        }
 
         if (result == JFileChooser.APPROVE_OPTION) {
             try {
