@@ -24,7 +24,17 @@ public class indexed_image {
 
         int[] cmap = temp.centroids.stream().mapToInt(Color::getRGB).toArray();
 
-        colorModel = new IndexColorModel(8, 256, cmap, 0, true, Transparency.TRANSLUCENT, DataBuffer.TYPE_BYTE);
+        byte[] red = new byte[cmap.length];
+        byte[] green = new byte[cmap.length];
+        byte[] blue = new byte[cmap.length];
+
+        for (int i = 0; i < cmap.length; i++) {
+            red[i] = (byte)((cmap[i] >> 16) & 0xff);
+            green[i] = (byte)((cmap[i] >> 8) & 0xff);
+            blue[i] = (byte)(cmap[i] & 0xff);
+        }
+
+        colorModel = new IndexColorModel(8, 256, red, green, blue);
 
         BufferedImage indexed_image = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_INDEXED, colorModel);
 

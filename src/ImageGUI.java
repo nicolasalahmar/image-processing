@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 public class ImageGUI extends JFrame {
-    private final String formatName = "png";
+    private static String formatName;
 
      final ImagePanel imageLabel;
     int originalImageSize, kMeanImageSize, uniformImageSize, medianCutImageSize, nearestColorImageSize;
@@ -54,6 +54,10 @@ public class ImageGUI extends JFrame {
     long kMeanImageTime = 0, uniformImageTime = 0, medianCutImageTime = 0, nearestColorTime = 0;
 
     class ImagePanel extends JPanel {
+
+        public static void getFormatName(String name){
+            formatName = name.split("\\.")[1];
+        }
 
         public void setImage(BufferedImage setImage) {
             currentImage = setImage;
@@ -247,6 +251,7 @@ public class ImageGUI extends JFrame {
     }
     public void loadImage() {
         int result = fileChooser.showOpenDialog(this);
+        ImagePanel.getFormatName(fileChooser.getSelectedFile().getName());
 
         if (result == JFileChooser.APPROVE_OPTION) {
             try {
