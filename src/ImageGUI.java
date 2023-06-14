@@ -68,9 +68,12 @@ public class ImageGUI extends JFrame {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D) g;
-
+            if (currentImage != null) {
+                int x = (getWidth() - currentImage.getWidth(null)) / 2;
+                int y = (getHeight() - currentImage.getHeight(null)) / 2;
+                g.drawImage(currentImage, x, y, null);
+            }
             // Draw the original image
-            g2d.drawImage(currentImage, 0, 0, null);
 
             // Draw the crop box overlay
             if (isCropSelected) {
