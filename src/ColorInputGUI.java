@@ -20,12 +20,12 @@ public class ColorInputGUI {
     private final List<JTextField> componentFields;
     public final JButton submitButton;
     private final JButton nextButton;
-    static List<Color> colors = new ArrayList<>();
+    static List<Color> colorsToSearchFor = new ArrayList<>();
     int numColors;
     int counter = 0;
 
-    public static List<Color> getColors() {
-        return colors;
+    public static List<Color> getColorsToSearchFor() {
+        return colorsToSearchFor;
     }
 
     public ColorInputGUI() {
@@ -67,7 +67,27 @@ public class ColorInputGUI {
             for (int j = 0; j < 3; j++) {
                 rgbs[j] = Integer.parseInt(componentFields.get(j).getText().trim());
             }
-            colors.add(new Color(rgbs[0], rgbs[1], rgbs[2]));
+            // get input color
+            Color inputTempColor = new Color(rgbs[0], rgbs[1], rgbs[2]);
+
+            colorsToSearchFor.add(inputTempColor);
+
+            // get hue , saturation , brightness of color
+            float[] hsb = Color.RGBtoHSB(
+                            inputTempColor.getRed(),
+                    inputTempColor.getGreen(),
+                    inputTempColor.getBlue(),
+                    null
+            );
+
+
+            // add all colors with similar hue ( get similar colors )
+            for(int i = 50 ; i<100 ; i++){
+                for (int j = 50; j<100;j++){
+                    colorsToSearchFor.add(Color.getHSBColor(hsb[0], i, j));
+                }
+            }
+
             frame.dispose();
             try {
                 searchByColor();
@@ -113,7 +133,7 @@ public class ColorInputGUI {
     public void searchByColor() throws IOException {
 
 
-        List<Color> targetColors = getColors();
+        List<Color> targetColors = getColorsToSearchFor();
 
         File resultsFolder = new File(image_route.image_route+"\\color_search_results");
         String folderPath =(image_route.image_route+"\\color_search_results");
@@ -192,7 +212,7 @@ public class ColorInputGUI {
                     buttonPanel.add(submitButton);
                     buttonPanel.remove(nextButton);
                 }
-                colors.add(new Color(rgbs[0], rgbs[1], rgbs[2]));
+                colorsToSearchFor.add(new Color(rgbs[0], rgbs[1], rgbs[2]));
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(frame, "Invalid input. Please enter integers and doubles only.", "Error", JOptionPane.ERROR_MESSAGE);
             }

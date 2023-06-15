@@ -67,13 +67,13 @@ public class ImageGUI extends JFrame {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D) g;
-            if (currentImage != null) {
-                int x = (getWidth() - currentImage.getWidth(null)) / 2;
-                int y = (getHeight() - currentImage.getHeight(null)) / 2;
-                g.drawImage(currentImage, x, y, null);
-            }
+//            if (currentImage != null) {
+//                int x = (getWidth() - currentImage.getWidth(null)) / 2;
+//                int y = (getHeight() - currentImage.getHeight(null)) / 2;
+//                g.drawImage(currentImage, x, y, null);
+//            }
             // Draw the original image
-           // g2d.drawImage(currentImage, 0, 0, null);
+            g2d.drawImage(currentImage, 0, 0, null);
 
             // Draw the crop box overlay
             if (isCropSelected) {
@@ -269,7 +269,6 @@ public class ImageGUI extends JFrame {
                // resizeButton.setEnabled(true);
                 uniformButton.setEnabled(true);nearestColorButton.setEnabled(true);colorPaletteButton.setEnabled(true);colorHistogramButton.setEnabled(true);compareButton.setEnabled(true);findSimilarImagesButton.setEnabled(true);kmeansButton.setEnabled(true);saveIndexedImageButton.setEnabled(true);saveImageButton.setEnabled(true);medianCutButton.setEnabled(true);restoreOriginal.setEnabled(true);
 
-
                 originalImageSize = getImageSize(originalImage);
                 currentImage = originalImage;
 
@@ -284,7 +283,9 @@ public class ImageGUI extends JFrame {
         originalImageSize = getImageSize(image);
         //currentImage = originalImage;
         ColorPalette colorPalette = new ColorPalette();
-        return colorPalette.createColorPalette(image, colorPaletteSize);
+        List getColorPalette = colorPalette.createColorPalette(image, colorPaletteSize);
+        //System.out.println(getColorPalette);
+        return getColorPalette;
     }
     public void findSimilarImages() throws IOException {
         //loadImage();
