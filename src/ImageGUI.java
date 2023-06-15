@@ -278,6 +278,7 @@ public class ImageGUI extends JFrame {
             }
         }
     }
+
     public List<Color> image_to_palette(BufferedImage image, int colorPaletteSize) throws IOException {
         //originalImage = ImageIO.read(file);
         originalImageSize = getImageSize(image);
