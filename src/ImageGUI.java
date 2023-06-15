@@ -48,18 +48,17 @@ public class ImageGUI extends JFrame {
     JSpinner medianCutSpinner,kMeansSpinner, uniformSpinner, nearestSpinner;
     JPanel controlPanel;
     JPanel colorPalettePanel = new JPanel(new GridLayout(0, 5));
-    JPanel datePanel = new JPanel();
     JFrame colorPaletteFrame = new JFrame("Color Palette");
     JFrame colorHistogramFrame = new JFrame("Color Histogram");
     long kMeanImageTime = 0, uniformImageTime = 0, medianCutImageTime = 0, nearestColorTime = 0;
 
     class ImagePanel extends JPanel {
-
         public static void getFormatName(String name){
             formatName = name.split("\\.")[1];
         }
 
         public void setImage(BufferedImage setImage) {
+
             currentImage = setImage;
             repaint(); // Redraw the panel with the new image
         }
@@ -74,6 +73,7 @@ public class ImageGUI extends JFrame {
                 g.drawImage(currentImage, x, y, null);
             }
             // Draw the original image
+           // g2d.drawImage(currentImage, 0, 0, null);
 
             // Draw the crop box overlay
             if (isCropSelected) {
@@ -173,7 +173,7 @@ public class ImageGUI extends JFrame {
     }
     public void init_findSimilarImagesButton() {
         findSimilarImagesButton = new JButton("find similar images");
-        findSimilarImagesButton.setEnabled(false);
+        //findSimilarImagesButton.setEnabled(false);
         findSimilarImagesButton.addActionListener(e -> {
             try {
                 findSimilarImages();
@@ -266,7 +266,8 @@ public class ImageGUI extends JFrame {
                 imageLabel.setPreferredSize(new Dimension(originalImage.getWidth(), originalImage.getHeight()));
 
 
-                resizeButton.setEnabled(true);uniformButton.setEnabled(true);nearestColorButton.setEnabled(true);colorPaletteButton.setEnabled(true);colorHistogramButton.setEnabled(true);compareButton.setEnabled(true);findSimilarImagesButton.setEnabled(true);kmeansButton.setEnabled(true);saveIndexedImageButton.setEnabled(true);saveImageButton.setEnabled(true);medianCutButton.setEnabled(true);resizeButton.setEnabled(true);restoreOriginal.setEnabled(true);
+               // resizeButton.setEnabled(true);
+                uniformButton.setEnabled(true);nearestColorButton.setEnabled(true);colorPaletteButton.setEnabled(true);colorHistogramButton.setEnabled(true);compareButton.setEnabled(true);findSimilarImagesButton.setEnabled(true);kmeansButton.setEnabled(true);saveIndexedImageButton.setEnabled(true);saveImageButton.setEnabled(true);medianCutButton.setEnabled(true);restoreOriginal.setEnabled(true);
 
 
                 originalImageSize = getImageSize(originalImage);
@@ -277,16 +278,17 @@ public class ImageGUI extends JFrame {
             }
         }
     }
-    public List<Color> image_to_palette(File file, int colorPaletteSize) throws IOException {
-        originalImage = ImageIO.read(file);
-        originalImageSize = getImageSize(originalImage);
-        currentImage = originalImage;
+    public List<Color> image_to_palette(BufferedImage image, int colorPaletteSize) throws IOException {
+        //originalImage = ImageIO.read(file);
+        originalImageSize = getImageSize(image);
+        //currentImage = originalImage;
         ColorPalette colorPalette = new ColorPalette();
-        return colorPalette.createColorPalette(currentImage, colorPaletteSize);
+        return colorPalette.createColorPalette(image, colorPaletteSize);
     }
     public void findSimilarImages() throws IOException {
-        loadImage();
-        double[] lab_paletteVector1 = PicturesSimilarity.toLabVector(image_to_palette(fileChooser.getSelectedFile(), 10));
+        //loadImage();
+
+        double[] lab_paletteVector1 = PicturesSimilarity.toLabVector(image_to_palette(currentImage, 10));
         File resultsFolder = new File(image_route.image_route+"\\similar_images_search_results");
         String folderPath =(image_route.image_route+"\\similar_images_search_results");
         resultsFolder.mkdirs();
@@ -322,7 +324,8 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
     List<File> resultImages =  new ArrayList<>();
     for (File file : listOfFiles) {
         if (file.isFile()) {
-            double[] lab_paletteVector2 = PicturesSimilarity.toLabVector(image_to_palette(file, 10));
+            BufferedImage image2 = ImageIO.read(file);
+            double[] lab_paletteVector2 = PicturesSimilarity.toLabVector(image_to_palette(image2, 10));
             if(PicturesSimilarity.cosineSimilarity(lab_paletteVector1, lab_paletteVector2) > 0.75){
                 resultImages.add(file);
             }
@@ -703,7 +706,7 @@ if (maxSizeString != null){
         isCropSelected = false;
         cropButton.setEnabled(false);
         cropBounds = null;
-        imageLabel.repaint();
+       // imageLabel.repaint();
     }
     private void resizeImage() {
         // Prompt for new width and height
