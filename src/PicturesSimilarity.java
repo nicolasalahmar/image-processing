@@ -60,7 +60,8 @@ public class PicturesSimilarity {
         double dotProduct = 0.0;
         double norm1 = 0.0;
         double norm2 = 0.0;
-        for (int i = 0; i < v1.length; i++) {
+        int length = Math.min(v1.length, v2.length);
+        for (int i = 0; i < length; i++) {
             dotProduct += v1[i] * v2[i];
             norm1 += Math.pow(v1[i], 2);
             norm2 += Math.pow(v2[i], 2);

@@ -280,7 +280,7 @@ public class ImageGUI extends JFrame {
 
     public List<Color> image_to_palette(BufferedImage image, int colorPaletteSize) throws IOException {
         //originalImage = ImageIO.read(file);
-        originalImageSize = getImageSize(image);
+        //originalImageSize = getImageSize(image);
         //currentImage = originalImage;
         ColorPalette colorPalette = new ColorPalette();
         List getColorPalette = colorPalette.createColorPalette(image, colorPaletteSize);
@@ -327,10 +327,15 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
     for (File file : listOfFiles) {
         if (file.isFile()) {
             BufferedImage image2 = ImageIO.read(file);
-            double[] lab_paletteVector2 = PicturesSimilarity.toLabVector(image_to_palette(image2, 10));
-            if(PicturesSimilarity.cosineSimilarity(lab_paletteVector1, lab_paletteVector2) > 0.75){
-                resultImages.add(file);
+            if(image2 != null){
+                double[] lab_paletteVector2 = PicturesSimilarity.toLabVector(image_to_palette(image2, 10));
+                if(PicturesSimilarity.cosineSimilarity(lab_paletteVector1, lab_paletteVector2) > 0.75){
+                    resultImages.add(file);
+                }
+            }else{
+                System.out.println("Null image");
             }
+
         } else if (file.isDirectory()) {
             // Recursively loop over the contents of the subfolder
             System.out.println("Entering subfolder: " + file.getName());
