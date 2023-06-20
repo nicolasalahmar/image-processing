@@ -73,7 +73,7 @@ public class ColorInputGUI {
             colorsToSearchFor.add(inputTempColor);
 
             colorsToSearchFor.addAll(
-                    ColorPalette.getSimilarColors(inputTempColor,25)
+                    ColorPalette.getSimilarColors(inputTempColor,15)
             );
 
             frame.dispose();
