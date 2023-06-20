@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class ColorInputGUI {
     private final JFrame frame;
@@ -48,7 +49,6 @@ public class ColorInputGUI {
             inputPanel.add(field);
         }
 
-
         buttonPanel.add(nextButton);
         submitButton.addActionListener(new SubmitListener());
         nextButton.addActionListener(new NextListener());
@@ -72,21 +72,9 @@ public class ColorInputGUI {
 
             colorsToSearchFor.add(inputTempColor);
 
-            // get hue , saturation , brightness of color
-            float[] hsb = Color.RGBtoHSB(
-                            inputTempColor.getRed(),
-                    inputTempColor.getGreen(),
-                    inputTempColor.getBlue(),
-                    null
+            colorsToSearchFor.addAll(
+                    ColorPalette.getSimilarColors(inputTempColor,25)
             );
-
-
-            // add all colors with similar hue ( get similar colors )
-            for(int i = 50 ; i<100 ; i++){
-                for (int j = 50; j<100;j++){
-                    colorsToSearchFor.add(Color.getHSBColor(hsb[0], i, j));
-                }
-            }
 
             frame.dispose();
             try {
@@ -96,35 +84,32 @@ public class ColorInputGUI {
             }
         }
     }
-    private static List<File> loopOverFolderContents(File folder,List<Color>colors,File resultsFolder) {
+    private static List<File> loopOverFolderContents(File folder,List<Color>colors) {
         File[] listOfFiles = folder.listFiles();
+        System.out.println("List of files"+listOfFiles);
         List<File> resultImages =  new ArrayList<>();
-        List<Color>palette=null;
+
 
         for (File file : listOfFiles) {
 
-                BufferedImage image = null;
-                try {
-                    image = ImageIO.read(file);
-                    ColorPalette colorPalette = new ColorPalette();
-                     palette = colorPalette.createColorPalette(image, 10);
+            try {
+                BufferedImage image =  ImageIO.read(file);
+                if(image != null){
+
+                    Set<Color> palette = ColorPalette.getBlockColorsFromImage(image,10);
+
+                    for (Color color1 : colors) {
+                        if(palette.contains(color1)){
+                            resultImages.add(file);
+                            break;
+                        }
+                    }
+                }else{
+                    System.out.println(file.getName() + "Is not a valid file");
+                }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                boolean containsColor = false;
-
-            for (Color color1 : colors) {
-                for (Color color2 : palette) {
-                    if (colorDistance(color1,color2)<50) {
-                        containsColor = true;
-                        resultImages.add(file);
-                        break;
-                    }
-                }
-                if (containsColor) {
-                    break;
-                }
-            }
 
 
         }
@@ -142,15 +127,13 @@ public class ColorInputGUI {
         fileChooser.setDialogTitle("Choose one or multiple folders to search in");
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         fileChooser.setMultiSelectionEnabled(true);
+
         int userSelection = fileChooser.showOpenDialog(null);
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File[] chosenFolders = fileChooser.getSelectedFiles();
 
-
-            for (File folder : chosenFolders)
-            {
-
-                ArrayList<File> images= (ArrayList<File>) loopOverFolderContents(folder,targetColors,resultsFolder);
+            for (File folder : chosenFolders) {
+                ArrayList<File> images= (ArrayList<File>) loopOverFolderContents(folder,targetColors);
                 DisplayPicsList.setImages(images);
                 DisplayPicsList.display();
                 for(File file: images){
