@@ -151,6 +151,7 @@ if(!images_files.isEmpty()){
         }
     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
              UnsupportedLookAndFeelException ex) {
+
         java.util.logging.Logger.getLogger(DisplayPicsList.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
     }
 

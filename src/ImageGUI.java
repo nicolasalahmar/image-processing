@@ -26,21 +26,14 @@ import java.util.List;
 
 public class ImageGUI extends JFrame {
     private static String formatName;
-
-     final ImagePanel imageLabel;
+    final ImagePanel imageLabel;
     int originalImageSize, kMeanImageSize, uniformImageSize, medianCutImageSize, nearestColorImageSize;
     JFileChooser fileChooser = new JFileChooser(image_route.image_route);
-
     BufferedImage currentImage;
-
     private BufferedImage originalImage;
-
     private Rectangle2D cropBounds;
     private boolean isCropSelected;
-
-    private JButton searchByDateButton,restoreOriginal,cropButton,resizeButton,uniformButton,nearestColorButton,colorPaletteButton,colorHistogramButton,compareButton,findSimilarImagesButton,kmeansButton,saveIndexedImageButton,saveImageButton,medianCutButton;
-
-
+    private JButton searchByDateButton, restoreOriginal, cropButton, resizeButton, uniformButton, nearestColorButton, colorPaletteButton, colorHistogramButton, compareButton, findSimilarImagesButton, kmeansButton, saveIndexedImageButton, saveImageButton, medianCutButton;
 
 
     JLabel kMeanLabel = new JLabel("clusters number");
@@ -48,8 +41,8 @@ public class ImageGUI extends JFrame {
     JLabel nearestLabel = new JLabel("nearest color");
     JLabel medianCutLabel = new JLabel("boxes number");
 
-    SpinnerModel medianCutSpinnerModel,kMeansSpinnerModel, uniformSpinnerModel, nearestColorSpinnerModel;
-    JSpinner medianCutSpinner,kMeansSpinner, uniformSpinner, nearestSpinner;
+    SpinnerModel medianCutSpinnerModel, kMeansSpinnerModel, uniformSpinnerModel, nearestColorSpinnerModel;
+    JSpinner medianCutSpinner, kMeansSpinner, uniformSpinner, nearestSpinner;
     JPanel controlPanel;
     JPanel colorPalettePanel = new JPanel(new GridLayout(0, 5));
     JFrame colorPaletteFrame = new JFrame("Color Palette");
@@ -57,7 +50,11 @@ public class ImageGUI extends JFrame {
     long kMeanImageTime = 0, uniformImageTime = 0, medianCutImageTime = 0, nearestColorTime = 0;
 
     class ImagePanel extends JPanel {
-        public static void getFormatName(String name){
+//        public static void getFormatName(String name) {
+//            formatName = name.split("\\.")[1];
+//        }
+
+        public static void getFormatName(String name) {
             formatName = name.split("\\.")[1];
         }
 
@@ -89,6 +86,7 @@ public class ImageGUI extends JFrame {
             }
         }
     }
+
     public ImageGUI() {
 
         colorPaletteFrame.setSize(300, 200);
@@ -140,41 +138,48 @@ public class ImageGUI extends JFrame {
         add(colorPalettePanel, BorderLayout.NORTH);
 
     }
+
     public void init_UniformButton() {
-         uniformButton = new JButton("Uniform");
+        uniformButton = new JButton("Uniform");
         uniformButton.setEnabled(false);
         uniformButton.addActionListener(e -> uniform());
         controlPanel.add(uniformButton);
     }
+
     public void init_NearestColor() {
-         nearestColorButton = new JButton("Nearest Color");
+        nearestColorButton = new JButton("Nearest Color");
         nearestColorButton.setEnabled(false);
         nearestColorButton.addActionListener(e -> nearestColor());
         controlPanel.add(nearestColorButton);
     }
+
     public void init_ColorPaletteButton() {
-         colorPaletteButton = new JButton("show color palette");
+        colorPaletteButton = new JButton("show color palette");
         colorPaletteButton.setEnabled(false);
         colorPaletteButton.addActionListener(e -> showColorPalette());
         controlPanel.add(colorPaletteButton);
     }
+
     public void init_ColorHistogramButton() {
-         colorHistogramButton = new JButton("show color histogram");
+        colorHistogramButton = new JButton("show color histogram");
         colorHistogramButton.setEnabled(false);
         colorHistogramButton.addActionListener(e -> showColorHistogram());
         controlPanel.add(colorHistogramButton);
     }
+
     public void init_CompareButton() {
-         compareButton = new JButton("compare algorithms");
+        compareButton = new JButton("compare algorithms");
         compareButton.setEnabled(false);
         compareButton.addActionListener(e -> compareAlgorithms());
         controlPanel.add(compareButton);
     }
+
     public void init_loadImageButton() {
         JButton loadImageButton = new JButton("load image");
         loadImageButton.addActionListener(e -> loadImage());
         controlPanel.add(loadImageButton);
     }
+
     public void init_findSimilarImagesButton() {
         findSimilarImagesButton = new JButton("find similar images");
         //findSimilarImagesButton.setEnabled(false);
@@ -187,70 +192,82 @@ public class ImageGUI extends JFrame {
         });
         controlPanel.add(findSimilarImagesButton);
     }
+
     public void init_saveImageButton() {
-         saveImageButton = new JButton("save image");
+        saveImageButton = new JButton("save image");
         saveImageButton.setEnabled(false);
         saveImageButton.addActionListener(e -> saveImage());
         controlPanel.add(saveImageButton);
     }
+
     public void init_saveIndexedImageButton() {
-         saveIndexedImageButton = new JButton("save as indexed image");
+        saveIndexedImageButton = new JButton("save as indexed image");
         saveIndexedImageButton.setEnabled(false);
         saveIndexedImageButton.addActionListener(e -> saveIndexedImage());
         controlPanel.add(saveIndexedImageButton);
     }
+
     public void init_KmeansButton() {
-         kmeansButton = new JButton("K_Means");
+        kmeansButton = new JButton("K_Means");
         kmeansButton.setEnabled(false);
         kmeansButton.addActionListener(e -> kMean());
         controlPanel.add(kmeansButton);
     }
+
     public void init_MedianButton() {
-         medianCutButton = new JButton("Median Cut");
+        medianCutButton = new JButton("Median Cut");
         medianCutButton.setEnabled(false);
         medianCutButton.addActionListener(e -> median_cut_new());
         controlPanel.add(medianCutButton);
     }
+
     public void init_restoreOriginalImageButton() {
-         restoreOriginal = new JButton("restore original");
+        restoreOriginal = new JButton("restore original");
         restoreOriginal.setEnabled(false);
         restoreOriginal.addActionListener(e -> restoreOriginal());
         controlPanel.add(restoreOriginal);
     }
+
     public void init_KmeansSpinner() {
         kMeansSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
         kMeansSpinner = new JSpinner(kMeansSpinnerModel);
         controlPanel.add(kMeanLabel);
         controlPanel.add(kMeansSpinner);
     }
+
     public void init_UniformSpinner() {
         uniformSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
         uniformSpinner = new JSpinner(uniformSpinnerModel);
         controlPanel.add(uniformLabel);
         controlPanel.add(uniformSpinner);
     }
+
     public void init_NearestSpinner() {
         nearestColorSpinnerModel = new SpinnerNumberModel(10, 1, 1024, 1);
         nearestSpinner = new JSpinner(nearestColorSpinnerModel);
         controlPanel.add(nearestLabel);
         controlPanel.add(nearestSpinner);
     }
+
     public void median_cut_Spinner() {
         medianCutSpinnerModel = new SpinnerNumberModel(10, 2, 1024, 2);
         medianCutSpinner = new JSpinner(medianCutSpinnerModel);
         controlPanel.add(medianCutLabel);
         controlPanel.add(medianCutSpinner);
     }
+
     public void init_searchByColor() {
         JButton searchByColor = new JButton("search By Color");
-        searchByColor.addActionListener(e ->  new ColorInputGUI());
+        searchByColor.addActionListener(e -> new ColorInputGUI());
         controlPanel.add(searchByColor);
     }
+
     public void init_searchBySize() {
         JButton searchBySize = new JButton("search By Size");
         searchBySize.addActionListener(e -> searchBySize());
         controlPanel.add(searchBySize);
     }
+
     public void init_searchByDate() {
         searchByDateButton = new JButton("Search By Date");
         searchByDateButton.addActionListener(e -> {
@@ -264,9 +281,10 @@ public class ImageGUI extends JFrame {
         });
         controlPanel.add(searchByDateButton);
     }
+
     public void loadImage() {
         int result = fileChooser.showOpenDialog(this);
-        if(fileChooser.getSelectedFile() !=null){
+        if (fileChooser.getSelectedFile() != null) {
             ImagePanel.getFormatName(fileChooser.getSelectedFile().getName());
 
         }
@@ -278,8 +296,18 @@ public class ImageGUI extends JFrame {
                 imageLabel.setPreferredSize(new Dimension(originalImage.getWidth(), originalImage.getHeight()));
 
 
-               // resizeButton.setEnabled(true);
-                uniformButton.setEnabled(true);nearestColorButton.setEnabled(true);colorPaletteButton.setEnabled(true);colorHistogramButton.setEnabled(true);compareButton.setEnabled(true);findSimilarImagesButton.setEnabled(true);kmeansButton.setEnabled(true);saveIndexedImageButton.setEnabled(true);saveImageButton.setEnabled(true);medianCutButton.setEnabled(true);restoreOriginal.setEnabled(true);
+                // resizeButton.setEnabled(true);
+                uniformButton.setEnabled(true);
+                nearestColorButton.setEnabled(true);
+                colorPaletteButton.setEnabled(true);
+                colorHistogramButton.setEnabled(true);
+                compareButton.setEnabled(true);
+                findSimilarImagesButton.setEnabled(true);
+                kmeansButton.setEnabled(true);
+                saveIndexedImageButton.setEnabled(true);
+                saveImageButton.setEnabled(true);
+                medianCutButton.setEnabled(true);
+                restoreOriginal.setEnabled(true);
 
                 originalImageSize = getImageSize(originalImage);
                 currentImage = originalImage;
@@ -299,12 +327,18 @@ public class ImageGUI extends JFrame {
         //System.out.println(getColorPalette);
         return getColorPalette;
     }
-    public void findSimilarImages() throws IOException {
-        //loadImage();
 
-        double[] lab_paletteVector1 = PicturesSimilarity.toLabVector(image_to_palette(currentImage, 10));
-        File resultsFolder = new File(image_route.image_route+"\\similar_images_search_results");
-        String folderPath =(image_route.image_route+"\\similar_images_search_results");
+    public void findSimilarImages() throws IOException {
+        loadImage();
+
+        File file2 = fileChooser.getSelectedFile();
+
+        BufferedImage image = ImageIO.read(file2);
+        BufferedImage quantizedImage = UniformQuantization.quantize(image, (int) uniformSpinnerModel.getValue());
+        indexed_image indexed = new indexed_image(quantizedImage);
+        double[] lab_paletteVector1 = PicturesSimilarity.toLabVector(image_to_palette(indexed.constructed_image, 20));
+        File resultsFolder = new File(image_route.image_route + "\\similar_images_search_results");
+        String folderPath = (image_route.image_route + "\\similar_images_search_results");
         resultsFolder.mkdirs();
         JFileChooser fileChooser = new JFileChooser(image_route.image_route);
         fileChooser.setDialogTitle("Choose one or multiple folders to search in");
@@ -316,13 +350,13 @@ public class ImageGUI extends JFrame {
 
             for (File folder : chosenFolders) {
                 System.out.println("Processing folder: " + folder.getName());
-                ArrayList<File> images= (ArrayList<File>) loopOverFolderContentsAndCompareSimilarity(folder,lab_paletteVector1,resultsFolder);
+                ArrayList<File> images = (ArrayList<File>) loopOverFolderContentsAndCompareSimilarity(folder, lab_paletteVector1, resultsFolder);
                 DisplayPicsList.setImages(images);
                 DisplayPicsList.display();
-                for(File file: images){
+                for (File file : images) {
                     Path destFolder = Paths.get(folderPath);
                     try {
-                        if(!Files.exists(destFolder.resolve(file.getName()))){
+                        if (!Files.exists(destFolder.resolve(file.getName()))) {
                             Files.copy(file.toPath(), destFolder.resolve(file.getName()));
                         }
                     } catch (IOException e) {
@@ -333,29 +367,33 @@ public class ImageGUI extends JFrame {
             }
         }
     }
-private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, double[] lab_paletteVector1, File resultsFolder) throws IOException {
-    File[] listOfFiles = folder.listFiles();
-    List<File> resultImages =  new ArrayList<>();
-    for (File file : listOfFiles) {
-        if (file.isFile()) {
-            BufferedImage image2 = ImageIO.read(file);
-            if(image2 != null){
-                double[] lab_paletteVector2 = PicturesSimilarity.toLabVector(image_to_palette(image2, 10));
-                if(PicturesSimilarity.cosineSimilarity(lab_paletteVector1, lab_paletteVector2) > 0.75){
-                    resultImages.add(file);
-                }
-            }else{
-                System.out.println("Null image");
-            }
 
-        } else if (file.isDirectory()) {
-            // Recursively loop over the contents of the subfolder
-            System.out.println("Entering subfolder: " + file.getName());
-            loopOverFolderContentsAndCompareSimilarity(file,lab_paletteVector1,resultsFolder);
+    private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, double[] lab_paletteVector1, File resultsFolder) throws IOException {
+        File[] listOfFiles = folder.listFiles();
+        List<File> resultImages = new ArrayList<>();
+        for (File file : listOfFiles) {
+            if (file.isFile()) {
+                BufferedImage image2 = ImageIO.read(file);
+                BufferedImage quantizedImage = UniformQuantization.quantize(image2, (int) uniformSpinnerModel.getValue());
+
+                if (quantizedImage != null) {
+                    double[] lab_paletteVector2 = PicturesSimilarity.toLabVector(image_to_palette(quantizedImage, 20));
+                    System.out.println(file.getName() + " " + (PicturesSimilarity.euclideanDistance(lab_paletteVector1, lab_paletteVector2)));
+                    if (PicturesSimilarity.euclideanDistance(lab_paletteVector1, lab_paletteVector2) > 0.45) {
+                        resultImages.add(file);
+                    }
+                } else {
+                    System.out.println("Null image");
+                }
+
+            } else if (file.isDirectory()) {
+                // Recursively loop over the contents of the subfolder
+                System.out.println("Entering subfolder: " + file.getName());
+                loopOverFolderContentsAndCompareSimilarity(file, lab_paletteVector1, resultsFolder);
+            }
         }
+        return resultImages;
     }
-    return resultImages;
-}
 
     public void saveImage() {
         int result = fileChooser.showSaveDialog(this);
@@ -368,6 +406,7 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
             }
         }
     }
+
     public void saveIndexedImage() {
         int result = fileChooser.showSaveDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
@@ -380,11 +419,13 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
             }
         }
     }
+
     private void restoreOriginal() {
         fileChooser.setSelectedFile(new File("original." + formatName));
         currentImage = originalImage;
         imageLabel.setImage(originalImage);
     }
+
     private void uniform() {
         fileChooser.setSelectedFile(new File("uniform." + formatName));
         long startTime = System.nanoTime();
@@ -395,6 +436,7 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
         imageLabel.setImage(quantizedImage);
         uniformImageSize = getImageSize(quantizedImage);
     }
+
     private void nearestColor() {
         ColorPalette colorPalette = new ColorPalette();
         List<Color> palette = colorPalette.createColorPalette(originalImage, (int) nearestColorSpinnerModel.getValue());
@@ -409,6 +451,7 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
         nearestColorImageSize = getImageSize(nearestColorImage);
 
     }
+
     private void kMean() {
         fileChooser.setSelectedFile(new File("kMean." + formatName));
         long startTime = System.nanoTime();
@@ -419,12 +462,13 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
         imageLabel.setImage(quantizedImage);
         kMeanImageSize = getImageSize(quantizedImage);
     }
+
     private void median_cut_new() {
 
-        fileChooser.setSelectedFile(new File("median_cut."+formatName));
+        fileChooser.setSelectedFile(new File("median_cut." + formatName));
         long startTime = System.nanoTime();
 
-        BufferedImage quantizedImage = MediaCutNew.quantizeImage(originalImage,(int) medianCutSpinnerModel.getValue());
+        BufferedImage quantizedImage = MediaCutNew.quantizeImage(originalImage, (int) medianCutSpinnerModel.getValue());
 
         long endTime = System.nanoTime();
         medianCutImageTime = endTime - startTime;
@@ -432,6 +476,7 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
         imageLabel.setImage(quantizedImage);
         medianCutImageSize = getImageSize(quantizedImage);
     }
+
     private Integer getImageSize(BufferedImage quantizedImage) {
         ByteArrayOutputStream tmp = new ByteArrayOutputStream();
         try {
@@ -457,28 +502,23 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
         String bestAlgorithmInSize = "";
         String bestAlgorithmInTime = "";
 
-        double minimumSize = Math.min(Math.min(Math.min(kMeanImageSize,medianCutImageSize),uniformImageSize),nearestColorImageSize);
-        double minimumTime = Math.min(Math.min(Math.min(kMeanImageTime,medianCutImageTime),uniformImageTime),nearestColorTime);
+        double minimumSize = Math.min(Math.min(Math.min(kMeanImageSize, medianCutImageSize), uniformImageSize), nearestColorImageSize);
+        double minimumTime = Math.min(Math.min(Math.min(kMeanImageTime, medianCutImageTime), uniformImageTime), nearestColorTime);
 
         if (minimumSize == kMeanImageSize) {
             bestAlgorithmInSize = "K Means";
-        }
-        else if (minimumSize == uniformImageSize) {
+        } else if (minimumSize == uniformImageSize) {
             bestAlgorithmInSize = "Uniform";
-        }
-        else if (minimumSize == medianCutImageSize) {
+        } else if (minimumSize == medianCutImageSize) {
             bestAlgorithmInSize = "Median Cut";
-        }
-        else {
+        } else {
             bestAlgorithmInSize = "Nearest Color";
         }
         if (minimumTime == kMeanImageTime) {
             bestAlgorithmInTime = "K Means";
-        }
-        else if (minimumTime == uniformImageTime) {
+        } else if (minimumTime == uniformImageTime) {
             bestAlgorithmInTime = "Uniform";
-        }
-        else if (minimumTime == medianCutImageTime) {
+        } else if (minimumTime == medianCutImageTime) {
             bestAlgorithmInTime = "Median Cut";
         } else {
             bestAlgorithmInTime = "Nearest Color";
@@ -510,6 +550,7 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
 
         JOptionPane.showMessageDialog(null, message);
     }
+
     private void showColorPalette() {
         // Clear the color palette panel.
         colorPalettePanel.removeAll();
@@ -535,6 +576,7 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
         colorPaletteFrame.getContentPane().add(colorPalettePanel);
         colorPaletteFrame.setVisible(true);
     }
+
     private void showColorHistogram() {
         // Clear the color palette panel.
         colorPalettePanel.removeAll();
@@ -565,14 +607,15 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
 
         colorHistogramFrame.setVisible(true);
     }
+
     private void searchByDate() throws ImageProcessingException, IOException {
         DatePicker datePicker = new DatePicker(this);
         datePicker.setVisible(true);
         Date startDate = datePicker.getStartDateChooser().getDate();
         Date endDate = datePicker.getEndDateChooser().getDate();
 
-        File resultsFolder = new File(image_route.image_route+"\\date_search_results");
-        String folderPath =(image_route.image_route+"\\date_search_results");
+        File resultsFolder = new File(image_route.image_route + "\\date_search_results");
+        String folderPath = (image_route.image_route + "\\date_search_results");
         resultsFolder.mkdirs();
         JFileChooser fileChooser = new JFileChooser(image_route.image_route);
         fileChooser.setDialogTitle("Choose one or multiple folders to search in");
@@ -585,13 +628,13 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
 
             for (File folder : chosenFolders) {
                 System.out.println("Processing folder: " + folder.getName());
-                ArrayList<File> images= (ArrayList<File>) loopOverFolderContentsAndCheckDates(folder,startDate,endDate,resultsFolder);
+                ArrayList<File> images = (ArrayList<File>) loopOverFolderContentsAndCheckDates(folder, startDate, endDate, resultsFolder);
                 DisplayPicsList.setImages(images);
                 DisplayPicsList.display();
-                for(File file: images){
+                for (File file : images) {
                     Path destFolder = Paths.get(folderPath);
                     try {
-                        if(!Files.exists(destFolder.resolve(file.getName()))){
+                        if (!Files.exists(destFolder.resolve(file.getName()))) {
                             Files.copy(file.toPath(), destFolder.resolve(file.getName()));
                         }
                     } catch (IOException e) {
@@ -602,9 +645,10 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
             }
         }
     }
+
     private static List<File> loopOverFolderContentsAndCheckDates(File folder, Date firstDate, Date secondDate, File resultsFolder) throws ImageProcessingException, IOException {
         File[] listOfFiles = folder.listFiles();
-        List<File> resultImages =  new ArrayList<>();
+        List<File> resultImages = new ArrayList<>();
         for (File file : listOfFiles) {
             if (file.isFile()) {
                 Date date;
@@ -617,25 +661,25 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
                 ExifSubIFDDirectory directory
                         = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
 
-                        if(directory != null){
-                            if(directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL) != null){
-                                date   = directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
-                            }else {
-                                long timestamp = file.lastModified();
-                                Date fileDateTime = new Date(timestamp);
-                                date = fileDateTime;
-                            }
+                if (directory != null) {
+                    if (directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL) != null) {
+                        date = directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
+                    } else {
+                        long timestamp = file.lastModified();
+                        Date fileDateTime = new Date(timestamp);
+                        date = fileDateTime;
+                    }
 
-                        }else {
-                            long timestamp = file.lastModified();
-                            Date fileDateTime = new Date(timestamp);
-                            date = fileDateTime;
-                        }
-System.out.println(date);
+                } else {
+                    long timestamp = file.lastModified();
+                    Date fileDateTime = new Date(timestamp);
+                    date = fileDateTime;
+                }
+                System.out.println(date);
 
                 long timestamp = file.lastModified();
                 Date fileDateTime = new Date(timestamp);
-                if(date.compareTo(firstDate)>0&&date.compareTo(secondDate)<0){
+                if (date.compareTo(firstDate) > 0 && date.compareTo(secondDate) < 0) {
                     System.out.println(file.getName());
                     resultImages.add(file);
 
@@ -644,28 +688,29 @@ System.out.println(date);
             } else if (file.isDirectory()) {
                 // Recursively loop over the contents of the subfolder
                 System.out.println("Entering subfolder: " + file.getName());
-                loopOverFolderContentsAndCheckDates(file,firstDate,secondDate,resultsFolder);
+                loopOverFolderContentsAndCheckDates(file, firstDate, secondDate, resultsFolder);
             }
         }
         return resultImages;
     }
+
     private void searchBySize() {
         // Prompt for max and min size
         String minSizeString = JOptionPane.showInputDialog("Enter the minimum size in KB:");
         String maxSizeString = JOptionPane.showInputDialog("Enter the maximum size in KB:");
         int minSize = 0;
-        int maxSize=0;
-if(maxSizeString != null){
-     minSize = Integer.parseInt(minSizeString);
-}
-if (maxSizeString != null){
-     maxSize = Integer.parseInt(maxSizeString);
-}
+        int maxSize = 0;
+        if (maxSizeString != null) {
+            minSize = Integer.parseInt(minSizeString);
+        }
+        if (maxSizeString != null) {
+            maxSize = Integer.parseInt(maxSizeString);
+        }
 
 
         //making the results folder
-        File resultsFolder = new File(image_route.image_route+"\\size_search_results");
-        String folderPath =(image_route.image_route+"\\size_search_results");
+        File resultsFolder = new File(image_route.image_route + "\\size_search_results");
+        String folderPath = (image_route.image_route + "\\size_search_results");
         resultsFolder.mkdirs();
         JFileChooser fileChooser = new JFileChooser(image_route.image_route);
         fileChooser.setDialogTitle("Choose one or multiple folders to search in");
@@ -677,13 +722,13 @@ if (maxSizeString != null){
 
             for (File folder : chosenFolders) {
                 System.out.println("Processing folder: " + folder.getName());
-                ArrayList<File> images= (ArrayList<File>) loopOverFolderContentsAndCompareSize(folder,minSize,maxSize,resultsFolder);
+                ArrayList<File> images = (ArrayList<File>) loopOverFolderContentsAndCompareSize(folder, minSize, maxSize, resultsFolder);
                 DisplayPicsList.setImages(images);
                 DisplayPicsList.display();
-                for(File file: images){
+                for (File file : images) {
                     Path destFolder = Paths.get(folderPath);
                     try {
-                        if(!Files.exists(destFolder.resolve(file.getName()))){
+                        if (!Files.exists(destFolder.resolve(file.getName()))) {
                             Files.copy(file.toPath(), destFolder.resolve(file.getName()));
                         }
                     } catch (IOException e) {
@@ -694,18 +739,19 @@ if (maxSizeString != null){
             }
         }
     }
-    private static List<File> loopOverFolderContentsAndCompareSize(File folder,double minSize,double maxSize,File resultsFolder) {
+
+    private static List<File> loopOverFolderContentsAndCompareSize(File folder, double minSize, double maxSize, File resultsFolder) {
         File[] listOfFiles = folder.listFiles();
-        List<File> resultImages =  new ArrayList<>();
+        List<File> resultImages = new ArrayList<>();
         for (File file : listOfFiles) {
             if (file.isFile()) {
-                if(file.length()/1024 < maxSize && file.length()/1024 > minSize){
+                if (file.length() / 1024 < maxSize && file.length() / 1024 > minSize) {
                     resultImages.add(file);
                 }
             } else if (file.isDirectory()) {
                 // Recursively loop over the contents of the subfolder
                 System.out.println("Entering subfolder: " + file.getName());
-                loopOverFolderContentsAndCompareSize(file,minSize,maxSize,resultsFolder);
+                loopOverFolderContentsAndCompareSize(file, minSize, maxSize, resultsFolder);
             }
         }
         return resultImages;
@@ -732,14 +778,15 @@ if (maxSizeString != null){
         setLocationRelativeTo(null);
         setVisible(true);
     }
+
     private void cropImage() {
         int x = (int) cropBounds.getX();
-        int y = (int) cropBounds.getY() ;
+        int y = (int) cropBounds.getY();
         int width = (int) cropBounds.getWidth();
         int height = (int) cropBounds.getHeight();
         try {
             currentImage = currentImage.getSubimage(x, y, width, height);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("Crop failed outside of Raster");
         }
         //Update the original image in the image panel
@@ -750,8 +797,9 @@ if (maxSizeString != null){
         isCropSelected = false;
         cropButton.setEnabled(false);
         cropBounds = null;
-       // imageLabel.repaint();
+        // imageLabel.repaint();
     }
+
     private void resizeImage() {
         // Prompt for new width and height
         String widthString = JOptionPane.showInputDialog("Enter the new width:");
@@ -760,7 +808,7 @@ if (maxSizeString != null){
         int newWidth = Integer.parseInt(widthString);
         int newHeight = Integer.parseInt(heightString);
         // Resize the image
-        currentImage = resizeImageBuffer(originalImage,newWidth,newHeight);
+        currentImage = resizeImageBuffer(originalImage, newWidth, newHeight);
         // Update the original image in the ImagePanel
         imageLabel.setImage(currentImage);
         imageLabel.setPreferredSize(new Dimension(newWidth, newHeight));
@@ -771,6 +819,7 @@ if (maxSizeString != null){
         cropBounds = null;
         imageLabel.repaint();
     }
+
     public static BufferedImage resizeImageBuffer(BufferedImage originalImage, int newWidth, int newHeight) {
         BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, originalImage.getType());
 
@@ -781,8 +830,10 @@ if (maxSizeString != null){
 
         return resizedImage;
     }
+
     private class CustomMouseListener extends MouseAdapter {
         private Point startPoint;
+
         @Override
         public void mousePressed(MouseEvent e) {
             startPoint = e.getPoint();
