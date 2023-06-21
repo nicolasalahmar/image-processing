@@ -374,18 +374,16 @@ public class ImageGUI extends JFrame {
         for (File file : listOfFiles) {
             if (file.isFile()) {
                 BufferedImage image2 = ImageIO.read(file);
-                BufferedImage quantizedImage = UniformQuantization.quantize(image2, (int) uniformSpinnerModel.getValue());
+                if(image2 != null){
+                    BufferedImage quantizedImage = UniformQuantization.quantize(image2, 10);
 
-                if (quantizedImage != null) {
                     double[] lab_paletteVector2 = PicturesSimilarity.toLabVector(image_to_palette(quantizedImage, 20));
                     System.out.println(file.getName() + " " + (PicturesSimilarity.euclideanDistance(lab_paletteVector1, lab_paletteVector2)));
                     if (PicturesSimilarity.euclideanDistance(lab_paletteVector1, lab_paletteVector2) > 0.45) {
                         resultImages.add(file);
                     }
-                } else {
-                    System.out.println("Null image");
-                }
 
+                }
             } else if (file.isDirectory()) {
                 // Recursively loop over the contents of the subfolder
                 System.out.println("Entering subfolder: " + file.getName());
