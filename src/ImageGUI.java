@@ -2,6 +2,10 @@ import color_quantization_algorithms.KMeansQuantizer;
 import color_quantization_algorithms.MediaCutNew;
 import color_quantization_algorithms.NearestColorAlgorithm;
 import color_quantization_algorithms.UniformQuantization;
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.exif.ExifSubIFDDirectory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -249,7 +253,15 @@ public class ImageGUI extends JFrame {
     }
     public void init_searchByDate() {
         searchByDateButton = new JButton("Search By Date");
-        searchByDateButton.addActionListener(e -> searchByDate());
+        searchByDateButton.addActionListener(e -> {
+            try {
+                searchByDate();
+            } catch (ImageProcessingException ex) {
+                throw new RuntimeException(ex);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         controlPanel.add(searchByDateButton);
     }
     public void loadImage() {
@@ -553,7 +565,7 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
 
         colorHistogramFrame.setVisible(true);
     }
-    private void searchByDate() {
+    private void searchByDate() throws ImageProcessingException, IOException {
         DatePicker datePicker = new DatePicker(this);
         datePicker.setVisible(true);
         Date startDate = datePicker.getStartDateChooser().getDate();
@@ -590,15 +602,40 @@ private List<File> loopOverFolderContentsAndCompareSimilarity(File folder, doubl
             }
         }
     }
-    private static List<File> loopOverFolderContentsAndCheckDates(File folder, Date firstDate, Date secondDate, File resultsFolder) {
+    private static List<File> loopOverFolderContentsAndCheckDates(File folder, Date firstDate, Date secondDate, File resultsFolder) throws ImageProcessingException, IOException {
         File[] listOfFiles = folder.listFiles();
         List<File> resultImages =  new ArrayList<>();
         for (File file : listOfFiles) {
-
             if (file.isFile()) {
+                Date date;
+                Metadata metadata = ImageMetadataReader.readMetadata(file);
+//                for (Directory directory : metadata.getDirectories()) {
+//                    for (Tag tag : directory.getTags()) {
+//                        System.out.println(tag);
+//                    }
+//                }
+                ExifSubIFDDirectory directory
+                        = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
+
+                        if(directory != null){
+                            if(directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL) != null){
+                                date   = directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
+                            }else {
+                                long timestamp = file.lastModified();
+                                Date fileDateTime = new Date(timestamp);
+                                date = fileDateTime;
+                            }
+
+                        }else {
+                            long timestamp = file.lastModified();
+                            Date fileDateTime = new Date(timestamp);
+                            date = fileDateTime;
+                        }
+System.out.println(date);
+
                 long timestamp = file.lastModified();
                 Date fileDateTime = new Date(timestamp);
-                if(fileDateTime.compareTo(firstDate)>0&&fileDateTime.compareTo(secondDate)<0){
+                if(date.compareTo(firstDate)>0&&date.compareTo(secondDate)<0){
                     System.out.println(file.getName());
                     resultImages.add(file);
 
