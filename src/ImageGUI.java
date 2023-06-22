@@ -677,7 +677,7 @@ public class ImageGUI extends JFrame {
 
                 long timestamp = file.lastModified();
                 Date fileDateTime = new Date(timestamp);
-                if (date.compareTo(firstDate) > 0 && date.compareTo(secondDate) < 0) {
+                if (date.compareTo(firstDate) >= 0 && date.compareTo(secondDate) <= 0) {
                     System.out.println(file.getName());
                     resultImages.add(file);
 
@@ -743,13 +743,19 @@ public class ImageGUI extends JFrame {
         List<File> resultImages = new ArrayList<>();
         for (File file : listOfFiles) {
             if (file.isFile()) {
-                if (file.length() / 1024 < maxSize && file.length() / 1024 > minSize) {
-                    resultImages.add(file);
+                try{
+                    if (ImageIO.read(file) != null) {
+                        if (file.length() / 1024 <= maxSize && file.length() / 1024 >= minSize) {
+                            resultImages.add(file);
+                        }
+                    }
+                }catch(Exception e){
+                    System.out.println("this file is not an image!");
                 }
             } else if (file.isDirectory()) {
                 // Recursively loop over the contents of the subfolder
                 System.out.println("Entering subfolder: " + file.getName());
-                loopOverFolderContentsAndCompareSize(file, minSize, maxSize, resultsFolder);
+                resultImages.addAll(loopOverFolderContentsAndCompareSize(file, minSize, maxSize, resultsFolder));
             }
         }
         return resultImages;
