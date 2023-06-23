@@ -378,8 +378,8 @@ public class ImageGUI extends JFrame {
 
                 if (quantizedImage != null) {
                     double[] lab_paletteVector2 = PicturesSimilarity.toLabVector(image_to_palette(quantizedImage, 20));
-                    System.out.println(file.getName() + " " + (PicturesSimilarity.euclideanDistance(lab_paletteVector1, lab_paletteVector2)));
-                    if (PicturesSimilarity.euclideanDistance(lab_paletteVector1, lab_paletteVector2) > 0.45) {
+                    System.out.println(file.getName() + " " + (PicturesSimilarity.cosineSimilarity(lab_paletteVector1, lab_paletteVector2)));
+                    if (PicturesSimilarity.cosineSimilarity(lab_paletteVector1, lab_paletteVector2) > 0.79) {
                         resultImages.add(file);
                     }
                 } else {
