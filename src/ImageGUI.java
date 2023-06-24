@@ -296,7 +296,7 @@ public class ImageGUI extends JFrame {
                 imageLabel.setPreferredSize(new Dimension(originalImage.getWidth(), originalImage.getHeight()));
 
 
-                // resizeButton.setEnabled(true);
+                 resizeButton.setEnabled(true);
                 uniformButton.setEnabled(true);
                 nearestColorButton.setEnabled(true);
                 colorPaletteButton.setEnabled(true);
@@ -651,11 +651,6 @@ public class ImageGUI extends JFrame {
             if (file.isFile()) {
                 Date date;
                 Metadata metadata = ImageMetadataReader.readMetadata(file);
-//                for (Directory directory : metadata.getDirectories()) {
-//                    for (Tag tag : directory.getTags()) {
-//                        System.out.println(tag);
-//                    }
-//                }
                 ExifSubIFDDirectory directory
                         = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
 
