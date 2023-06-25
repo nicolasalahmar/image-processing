@@ -284,7 +284,7 @@ public class ImageGUI extends JFrame {
     }
 
     public void loadImage() {
-        isCroped=false;
+        isCropped =false;
         int result = fileChooser.showOpenDialog(this);
         if (fileChooser.getSelectedFile() != null) {
             ImagePanel.getFormatName(fileChooser.getSelectedFile().getName());
@@ -331,12 +331,14 @@ public class ImageGUI extends JFrame {
     }
 
     public void findSimilarImages() throws IOException {
-     //   loadImage();
 
-        //File file2 = fileChooser.getSelectedFile();
+        if(currentImage == null){
+            loadImage();
+        }
+        BufferedImage    quantizedImage = UniformQuantization.quantize(currentImage, (int) uniformSpinnerModel.getValue());
 
-       // BufferedImage image = ImageIO.read(file2);
-        BufferedImage quantizedImage = UniformQuantization.quantize(currentImage, (int) uniformSpinnerModel.getValue());
+
+
         indexed_image indexed = new indexed_image(quantizedImage);
         double[] lab_paletteVector1 = PicturesSimilarity.toLabVector(image_to_palette(indexed.constructed_image, 20));
         File resultsFolder = new File(image_route.image_route + "\\similar_images_search_results");
@@ -382,7 +384,7 @@ public class ImageGUI extends JFrame {
                     double[] lab_paletteVector2 = PicturesSimilarity.toLabVector(image_to_palette(quantizedImage, 20));
                     System.out.println(file.getName() + " " + (PicturesSimilarity.cosineSimilarity(lab_paletteVector1, lab_paletteVector2)));
                     double similarityFactor = 0.79;
-                    if(isCroped){
+                    if(isCropped){
                         similarityFactor = 0.9;
                     }
                     if (PicturesSimilarity.cosineSimilarity(lab_paletteVector1, lab_paletteVector2) > similarityFactor) {
@@ -425,7 +427,7 @@ public class ImageGUI extends JFrame {
     }
 
     private void restoreOriginal() {
-        isCroped=false;
+        isCropped =false;
         fileChooser.setSelectedFile(new File("original." + formatName));
         currentImage = originalImage;
         imageLabel.setImage(originalImage);
@@ -812,9 +814,9 @@ public class ImageGUI extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
     }
-boolean isCroped=false;
+    boolean isCropped =false;
     private void cropImage() {
-         isCroped = true;
+         isCropped = true;
         int x = (int) cropBounds.getX();
         int y = (int) cropBounds.getY();
         int width = (int) cropBounds.getWidth();
