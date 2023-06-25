@@ -21,11 +21,11 @@ public class ColorInputGUI {
     private final List<JTextField> componentFields;
     public final JButton submitButton;
     private final JButton nextButton;
-    static List<Color> colorsToSearchFor = new ArrayList<>();
+     List<Color> colorsToSearchFor = new ArrayList<>();
     int numColors;
     int counter = 0;
 
-    public static List<Color> getColorsToSearchFor() {
+    public  List<Color> getColorsToSearchFor() {
         return colorsToSearchFor;
     }
 
@@ -117,8 +117,8 @@ public class ColorInputGUI {
     }
     public void searchByColor() throws IOException {
 
-
-        List<Color> targetColors = getColorsToSearchFor();
+        List<Color> targetColors =new ArrayList<>();
+        targetColors = getColorsToSearchFor();
 
         File resultsFolder = new File(image_route.image_route+"\\color_search_results");
         String folderPath =(image_route.image_route+"\\color_search_results");
