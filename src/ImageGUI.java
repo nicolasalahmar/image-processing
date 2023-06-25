@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -608,10 +609,25 @@ public class ImageGUI extends JFrame {
 
     private void searchByDate() throws ImageProcessingException, IOException {
         DatePicker datePicker = new DatePicker(this);
-        datePicker.setVisible(true);
-        Date startDate = datePicker.getStartDateChooser().getDate();
-        Date endDate = datePicker.getEndDateChooser().getDate();
+        Calendar oldestDate = Calendar.getInstance();
+        oldestDate.set(Calendar.YEAR, 1); // set the year to 1
+        oldestDate.set(Calendar.MONTH, Calendar.JANUARY); // set the month to January (month 0)
+        oldestDate.set(Calendar.DAY_OF_MONTH, 1); // set the day of month to 1
+        Calendar tomorrow = Calendar.getInstance();
+        tomorrow.add(Calendar.DAY_OF_MONTH, 1); // add 1 day to the current date
 
+        datePicker.setVisible(true);
+        Date startDate = oldestDate.getTime();
+        Date endDate=tomorrow.getTime();
+        if(datePicker.getStartDateChooser().getDate() !=null){
+
+            startDate=datePicker.getStartDateChooser().getDate();
+        }
+        if(datePicker.getEndDateChooser().getDate() !=null){
+
+            endDate=datePicker.getEndDateChooser().getDate();
+
+        }
         File resultsFolder = new File(image_route.image_route + "\\date_search_results");
         String folderPath = (image_route.image_route + "\\date_search_results");
         resultsFolder.mkdirs();
@@ -668,12 +684,12 @@ public class ImageGUI extends JFrame {
                     Date fileDateTime = new Date(timestamp);
                     date = fileDateTime;
                 }
-                System.out.println(date);
+
 
                 long timestamp = file.lastModified();
                 Date fileDateTime = new Date(timestamp);
                 if (date.compareTo(firstDate) >= 0 && date.compareTo(secondDate) <= 0) {
-                    System.out.println(file.getName());
+                   System.out.println(date);
                     resultImages.add(file);
 
 
