@@ -689,15 +689,28 @@ public class ImageGUI extends JFrame {
 
     private void searchBySize() {
         // Prompt for max and min size
+
         String minSizeString = JOptionPane.showInputDialog("Enter the minimum size in KB:");
         String maxSizeString = JOptionPane.showInputDialog("Enter the maximum size in KB:");
-        int minSize = 0;
-        int maxSize = 0;
-        if (maxSizeString != null) {
-            minSize = Integer.parseInt(minSizeString);
+        Double minSize = 0.0;
+        Double maxSize = 100000.0;
+        if (!minSizeString.equals("")) {
+            try {
+                minSize = Double.parseDouble(minSizeString);
+            }
+           catch (NumberFormatException e){
+               System.out.println("The string does not represent an integer: " + minSizeString);
+
+           }
         }
-        if (maxSizeString != null) {
-            maxSize = Integer.parseInt(maxSizeString);
+        if (!maxSizeString.equals("")) {
+            try {
+                maxSize = Double.parseDouble(maxSizeString);
+            }catch (NumberFormatException e){
+                System.out.println("The string does not represent an integer: " + maxSizeString);
+
+            }
+
         }
 
 
