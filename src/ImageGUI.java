@@ -718,7 +718,8 @@ public class ImageGUI extends JFrame {
         String maxSizeString = JOptionPane.showInputDialog("Enter the maximum size in KB:");
         Double minSize = 0.0;
         Double maxSize = 100000.0;
-        if (!minSizeString.equals("")) {
+        if(minSizeString != null){
+        if (!minSizeString.equals("")&&maxSizeString != null) {
             try {
                 minSize = Double.parseDouble(minSizeString);
             }
@@ -726,7 +727,8 @@ public class ImageGUI extends JFrame {
                System.out.println("The string does not represent an integer: " + minSizeString);
 
            }
-        }
+        }}
+        if(maxSizeString != null){
         if (!maxSizeString.equals("")) {
             try {
                 maxSize = Double.parseDouble(maxSizeString);
@@ -735,6 +737,7 @@ public class ImageGUI extends JFrame {
 
             }
 
+        }
         }
 
 
@@ -842,8 +845,25 @@ public class ImageGUI extends JFrame {
         String widthString = JOptionPane.showInputDialog("Enter the new width:");
         String heightString = JOptionPane.showInputDialog("Enter the new height:");
         // Parse width and height values
-        int newWidth = Integer.parseInt(widthString);
-        int newHeight = Integer.parseInt(heightString);
+        int newWidth = currentImage.getWidth();
+        int newHeight = currentImage.getHeight();
+        if(widthString != null){
+            if(!widthString.equals("")){
+               newWidth= Integer.parseInt(widthString);
+
+
+            }
+
+        }
+        if(heightString != null){
+
+            if(!heightString.equals("")){
+                newHeight=Integer.parseInt(heightString);
+
+
+            }
+
+        }
         // Resize the image
         currentImage = resizeImageBuffer(originalImage, newWidth, newHeight);
         // Update the original image in the ImagePanel
