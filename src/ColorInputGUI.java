@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -64,17 +65,26 @@ public class ColorInputGUI {
     private class SubmitListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             int[] rgbs = new int[3];
+
             for (int j = 0; j < 3; j++) {
                 rgbs[j] = Integer.parseInt(componentFields.get(j).getText().trim());
             }
+
             // get input color
             Color inputTempColor = new Color(rgbs[0], rgbs[1], rgbs[2]);
-
             colorsToSearchFor.add(inputTempColor);
 
-            colorsToSearchFor.addAll(
-                    ColorPalette.getSimilarColors(inputTempColor,15)
-            );
+            //get similar colors
+            List<Color> tempListSearch = new ArrayList<>();
+
+            for (Color searchColor : colorsToSearchFor) {
+                tempListSearch.addAll(ColorPalette.getSimilarColors(searchColor,15));
+            }
+
+            colorsToSearchFor.addAll(tempListSearch);
+//            colorsToSearchFor.addAll(
+//                    ColorPalette.getSimilarColors(inputTempColor,15)
+//            );
 
             frame.dispose();
             try {
